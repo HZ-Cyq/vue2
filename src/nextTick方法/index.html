@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Next Tick Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+
+<div id="app">
+  <p>{{ message }}</p>
+  <button @click="updateMessage">Update Message</button>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    message: 'Initial message'
+  },
+  methods: {
+    updateMessage() {
+      this.message = 'Updated message';
+
+      // 在下一个 tick 中获取更新后的 DOM 状态
+      this.$nextTick(() => {
+        console.log(this.$el.querySelector('p').textContent); // 输出: Updated message
+      });
+    }
+  }
+});
+</script>
+
+</body>
+</html>
