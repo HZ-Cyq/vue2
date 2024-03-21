@@ -1,0 +1,23 @@
+<!-- 这里attribute_name需要都是小写，否则会报错 -->
+<div id="app" tabindex="0" v-on:[attribute_name]="divClick">
+    <!-- <span v-on:click="click">aaa</span>
+    表格：<input v-on:focus="focus"></input> -->
+    aaa
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        data:{
+            attribute_name:"focus",
+        },
+        methods:{
+            divClick: function() {
+                console.log("div click");
+            },
+            divFocus: function() {
+                console.log("div fovus");
+            }
+        }
+    });
+</script>

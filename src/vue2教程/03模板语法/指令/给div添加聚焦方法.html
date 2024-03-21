@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabindex and Focus Example</title>
+</head>
+<body>
+
+<div id="myDiv" tabindex="0" style="padding: 20px; background-color: #f0f0f0;">
+    This div can be focused by pressing Tab key.
+</div>
+
+<script>
+    // 获取到 div 元素
+    var myDiv = document.getElementById("myDiv");
+
+    // 添加 focus 事件监听器
+    myDiv.addEventListener("focus", function() {
+        // 当 div 元素获得焦点时，改变其背景颜色为蓝色
+        myDiv.style.backgroundColor = "blue";
+    });
+
+    // 添加 blur 事件监听器
+    myDiv.addEventListener("blur", function() {
+        // 当 div 元素失去焦点时，恢复其原本的背景颜色
+        myDiv.style.backgroundColor = "#f0f0f0";
+    });
+</script>
+
+</body>
+</html>

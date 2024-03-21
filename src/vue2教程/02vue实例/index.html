@@ -1,0 +1,24 @@
+<div id="app">
+    <ul>
+        <li v-for="product in products">{{product}}</li>
+    </ul>
+</div>
+<script src="../../../node_modules/vue/dist/vue.js"></script>
+<script>
+    const app = new Vue({
+        el:'#app',
+        data: {
+            products: [
+                "boots",
+                "jacket",
+            ]
+        },
+        created() {
+            fetch('https://www.myjson.cn/json.html')
+            .then(response => response.json())
+            .then(json => {
+                this.products = json.products;
+            })
+        }
+    })
+</script>

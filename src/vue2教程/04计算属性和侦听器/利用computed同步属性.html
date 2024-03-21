@@ -1,0 +1,18 @@
+<div id="app">
+    {{fullName}}
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        data: {
+            firstName:"Alice",
+            lastName:"Chen",
+        },
+        computed:{
+            fullName: function() {
+                return this.firstName + " " + this.lastName;
+            }
+        }
+    })
+</script>

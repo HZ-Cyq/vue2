@@ -1,0 +1,13 @@
+<div id="app">
+    {{ message }}
+    <input v-model="message"/>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    const app = new Vue({
+        el:"#app",
+        data: {
+            message: 'Hello vue',
+        },
+    });
+</script>

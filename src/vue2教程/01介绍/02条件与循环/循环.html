@@ -1,0 +1,18 @@
+<div id="app">
+    <li v-for="item in array">
+        {{item}}
+    </li>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    const app = new Vue({
+        el:"#app",
+        data: {
+            array:[
+                "第一个列表的内容", 
+                "第二个列表的内容",
+                "第三个列表的内容",
+            ]
+        },
+    })    
+</script>

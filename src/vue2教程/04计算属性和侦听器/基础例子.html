@@ -1,0 +1,18 @@
+<div id="app">
+    <p>message: {{message}}</p>
+    <p>Reversed message: {{reverseMessage()}}</p>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        data: {
+            message:"hello world",      
+        },
+        methods:{
+            reverseMessage: function() {
+                return this.message.split('').reverse().join('');
+            }
+        }
+    });
+</script>

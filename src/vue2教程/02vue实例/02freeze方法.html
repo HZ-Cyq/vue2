@@ -1,0 +1,17 @@
+<div id="app">
+    {{a}}
+    {{b}}
+    <button v-on:click="a = 'baz'">更换a的值</button>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    var obj = {
+        a:"aa",
+        b:"bb",
+    };
+    Object.freeze(obj);
+    let app = new Vue({
+        el:"#app",
+        data:obj,
+    })
+</script>

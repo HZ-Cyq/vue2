@@ -1,0 +1,20 @@
+<div id="app">
+    <button v-on:click="a = 'bb'">更换a的值</button>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    var data = {
+        a:"aa",
+        b:"bb",
+    }
+    let vm = new Vue({
+        el: "#app",
+        data: data,
+    })
+    console.log(vm.$el === document.getElementById("app"));
+    console.log(vm.$data === data);
+    // 这个回调会在vm.a改变后调用
+    vm.$watch('a', function(newValue, oldValue) {
+        console.log("a changed newValue:" + newValue + ", oldValue:" + oldValue);
+    });
+</script>

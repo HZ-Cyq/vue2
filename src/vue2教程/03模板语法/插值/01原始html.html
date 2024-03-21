@@ -1,0 +1,13 @@
+<div id="app">
+    <!-- {{rawHtml}} -->
+    <span v-html="rawHtml"></span>
+</div>
+<script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        data:{
+            rawHtml:"<span style='color:red'>https://www.baidu.com</span>",
+        },
+    })
+</script>
