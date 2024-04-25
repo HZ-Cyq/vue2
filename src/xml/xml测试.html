@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using xml-js in Browser</title>
+    <!-- Include xml-js library -->
+    <script src="/node_modules/xml-js/dist/xml-js.min.js"></script>
+</head>
+<body>
+    <!-- Your JavaScript code using xml-js here -->
+    <script>
+        // // Example usage
+        // let data = {
+        //     persion: {
+        //         _attributes:{id: "1", type:"adult"},
+        //         name: "John",
+        //         age: 30,
+        //         city: "New York",
+        //         uid:10,
+        //     }
+        // };
+
+        // // let options = { compact: true, ignoreComment: true, spaces: 4 };
+        // let options = {compact:true, spaces: 4}
+        // let xml = window.js2xml(data, options); // 使用 xmljs 而不是 xml-js
+        // console.log(xml);
+
+        // let obj = {
+        //     a:{
+        //         b:[
+        //             {name:"Alice", age:10},
+        //             {name:"Bob", age:15},
+        //         ]
+        //     }
+        // }
+        // let options = {compact: false, spaces: 4}
+        // let xml = window.js2xml(obj, options);
+        // console.log(xml);
+
+        // 你的 JavaScript 对象
+    // const obj = {
+    //     Version: ''
+    // };
+
+    // // 将 JavaScript 对象转换为 XML
+    // const xml = window.js2xml(obj, { compact: false, spaces: 2, fullTagEmptyElement: true });
+    // console.log(xml);
+
+        // let obj = {
+        //     "1:Laydown": 10,
+        // }
+        // console.log(obj["1:Laydown"]);
+
+        // let obj = {
+        //     person : {
+        //         a: 11,
+        //         b: 22,
+        //     }
+        // }
+        // let xml = window.js2xml(obj, {compact: true, spaces: 2});
+        // let obj2 = window.xml2js(xml, { compact: true, textKey: '_text', elementNameFn: () => true });
+        // console.log(obj2);
+
+        const xmlString = `
+<root>
+    <name>John</name>
+    <age>30</age>
+    <city>New York</city>
+</root>
+`;
+
+const options = { compact: true };
+const jsObject = window.xml2js(xmlString, options);
+
+console.log(jsObject);
+    </script>
+</body>
+</html>

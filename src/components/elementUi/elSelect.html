@@ -1,0 +1,53 @@
+<div id="app">
+  <!-- Basic Usage -->
+  <el-select v-model="selectedValue" placeholder="Select">
+    <el-option label="Option 1" value="option1"></el-option>
+    <el-option label="Option 2" value="option2"></el-option>
+    <el-option label="Option 3" value="option3"></el-option>
+  </el-select>
+
+  <!-- Multiple Selection -->
+  <el-select v-model="selectedValues" multiple placeholder="Select">
+    <el-option label="Option A" value="A"></el-option>
+    <el-option label="Option B" value="B"></el-option>
+    <el-option label="Option C" value="C"></el-option>
+  </el-select>
+
+  <!-- With Search -->
+  <el-select v-model="searchValue" filterable placeholder="Search">
+    <el-option label="Apple" value="apple"></el-option>
+    <el-option label="Banana" value="banana"></el-option>
+    <el-option label="Orange" value="orange"></el-option>
+  </el-select>
+  <el-select v-model="selectedOption" placeholder="请选择" @change="handleOptionChange">
+    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"
+      :disabled="item.disabled">
+      <!-- 自定义选项内容 -->
+      <span style="color: blue;">{{ item.label }}</span>
+    </el-option>
+  </el-select>
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<script>
+  const app = new Vue({
+    el: '#app',
+    data: {
+      selectedValue: '',
+      selectedValues: [],
+      searchValue: '',
+      options: [
+        { value: '1', label: '选项一', disabled: false },
+        { value: '2', label: '选项二', disabled: false },
+        { value: '3', label: '选项三', disabled: true }
+      ]
+    },
+    methods: {
+      handleOptionChange(value) {
+      console.log('用户选择了选项：', value);
+      // 在这里可以执行相应的操作，比如发送请求、更新数据等
+    }
+    }
+  });
+
+</script>

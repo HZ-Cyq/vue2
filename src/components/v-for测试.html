@@ -1,0 +1,38 @@
+<div id="app">
+    <ul>
+        <li v-for="item in getParams('newItem')">{{ item }}</li>
+    </ul>
+    <button @click="addItemToParam('newItem')">Add Item</button>
+</div>
+
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<script>
+ new Vue({
+    el: '#app',
+    data: {
+        param: ['example1', 'example2', 'example3']
+    },
+    computed: {
+        getParams: function() {
+            // 返回一个接受参数的函数
+            return function(param) {
+                // 在这个函数内部，根据传入的参数动态计算返回值
+                return this.param;
+            };
+        }
+    },
+    mounted() {
+        this.param.push("example4");
+        console.log("mounted: ", this.param);
+    },
+    methods: {
+        addItemToParam: function(newItem) {
+            // 在 param 数组中添加一个新元素
+            this.param.push(newItem);
+            console.log("addItemToParam:", this.param);
+        }
+    }
+});
+
+</script>

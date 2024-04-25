@@ -1,0 +1,24 @@
+<div id="app">
+ <!-- Basic Usage -->
+ <el-input v-model="inputValue" placeholder="Enter something..."></el-input>
+
+ <!-- With clearable option -->
+ <el-input v-model="inputValue2" placeholder="Enter something..." clearable></el-input>
+
+ <!-- Password input -->
+ <el-input v-model="password" placeholder="Enter password" type="password"></el-input>
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<script>
+   const app = new Vue({
+       el:'#app',
+       data: {
+            inputValue: '',
+            inputValue2: '',
+            password: ''
+       },
+   });
+
+</script>
+  

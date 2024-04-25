@@ -1,0 +1,19 @@
+<html>
+
+<script>
+  // 创建一个自定义事件
+  let customEvent = new CustomEvent('myEvent', {
+    detail: {
+      message: 'This is a custom event!'
+    }
+  });
+
+  // 添加事件监听器
+  document.addEventListener('myEvent', function(event) {
+    console.log('Custom event received:', event.detail.message);
+  });
+
+  // 触发自定义事件
+  document.dispatchEvent(customEvent);
+  </script>
+</html>

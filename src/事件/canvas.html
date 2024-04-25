@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Example</title>
+</head>
+<body>
+
+<canvas id="myCanvas" width="200" height="100"></canvas>
+
+<script>
+// 获取 Canvas 元素
+var canvas = document.getElementById('myCanvas');
+// 获取绘图上下文
+var ctx = canvas.getContext('2d');
+
+// 设置矩形颜色
+ctx.fillStyle = 'blue';
+// 绘制矩形
+ctx.fillRect(50, 25, 100, 50);
+</script>
+
+</body>
+</html>

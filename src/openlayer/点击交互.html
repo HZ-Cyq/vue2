@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenLayers Click Interaction Example</title>
+<link rel="stylesheet" href="https://openlayers.org/en/v6.14.2/css/ol.css" type="text/css">
+<script src="https://openlayers.org/en/v6.14.2/build/ol.js"></script>
+</head>
+<body>
+
+<div id="map" class="map"></div>
+
+<script>
+// 创建地图
+var map = new ol.Map({
+  target: 'map',
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM()
+    })
+  ],
+  view: new ol.View({
+    center: ol.proj.fromLonLat([0, 0]),
+    zoom: 2
+  })
+});
+
+// 创建点击交互
+var clickInteraction = new ol.interaction.Pointer({
+  handleDownEvent: function(event) {
+    // 获取点击位置的坐标
+    var coord = map.getCoordinateFromPixel(event.pixel);
+    // 将坐标转换为经纬度
+    var lonLat = ol.proj.toLonLat(coord);
+    // 在控制台输出点击位置的经纬度
+    console.log('Clicked coordinates:', lonLat);
+    // 在点击位置添加一个标记
+    addMarker(coord);
+  }
+});
+
+// 将点击交互添加到地图上
+map.addInteraction(clickInteraction);
+
+// 在地图上添加标记
+function addMarker(coord) {
+  var marker = new ol.Feature({
+    geometry: new ol.geom.Point(coord)
+  });
+  var markerStyle = new ol.style.Style({
+    image: new ol.style.Circle({
+      radius: 6,
+      fill: new ol.style.Fill({color: 'red'}),
+      stroke: new ol.style.Stroke({color: 'white', width: 2})
+    })
+  });
+  marker.setStyle(markerStyle);
+  
+  var vectorSource = new ol.source.Vector({
+    features: [marker]
+  });
+  
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource
+  });
+  
+  map.addLayer(vectorLayer);
+}
+</script>
+
+</body>
+</html>

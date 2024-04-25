@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Using el-slider with script tag</title>
+  <!-- 引入 Element UI 的样式文件 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+  <el-slider v-model="value" :min="0" :max="100" :step="1" @update:modelValue="handleUpdateModelValue"></el-slider>
+  <p>当前选择的值是: {{ value }}</p>
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<script>
+   const app = new Vue({
+       el:'#app',
+       data: {
+        value: 5,
+        value2: 20,
+        value3: 33.33,
+        value4: 50
+       },
+       methods: {
+        handleUpdateModelValue(newValue) {
+        this.value = newValue; // 更新值
+        console.log('滑块的值更新为:', this.value);
+      // 执行其他操作...
+      }
+      }
+   });
+
+</script>
+</body>
+</html>
+  

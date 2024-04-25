@@ -1,0 +1,31 @@
+<div id="app">
+    <todo-item v-bind:todo="grocery1"></todo-item><todo-item v-bind:todo="grocery2"></todo-item>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<div>{{ todo.text }}</div>'
+    })
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            grocery1: {
+                id: 0,
+                text: "蔬菜"
+            },
+            grocery2: {
+                id: 1,
+                text: "奶酪"
+            }
+        }
+    })
+</script>
+
+<style>
+    .inline-block {
+        display: inline-block;
+    }
+</style>

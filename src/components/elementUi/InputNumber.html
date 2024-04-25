@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using el-slider with script tag</title>
+    <!-- 引入 Element UI 的样式文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Basic Usage -->
+        <el-input-number v-model="sliderValue" :min="1" :max="10" label="Basic Example"></el-input-number>
+
+        <el-input-number v-model="sliderValue" :min="1" :max="10" label="Basic Example"></el-input-number>
+        <!-- With Step Size -->
+        <el-input-number v-model="value2" :min="0" :max="100" :step="5" label="With Step Size"></el-input-number>
+
+        <!-- With Precision -->
+        <el-input-number v-model="value3" :min="0" :max="100" :precision="2" label="With Precision"></el-input-number>
+        {{value3}}
+        <!-- Disabled -->
+        <el-input-number v-model="value4" :min="1" :max="100" :disabled="true" label="Disabled"></el-input-number>
+    </div>
+    <script src="/node_modules/vue/dist/vue.js"></script>
+    <script src="/node_modules/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                obj: {
+                    a: {
+                        b: {
+                            c: 50 // 初始值
+                        }
+                    }
+                },
+                arr: ['a', 'b', 'c'] // 属性名数组
+            },
+
+            computed: {
+                sliderValue: {
+                    get() {
+                        return _.get(this.obj, this.arr);
+                    },
+                    set(value) {
+                        _.set(this.obj, this.arr, value);
+                    }
+                }
+            }
+        });
+
+    </script>

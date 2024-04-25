@@ -1,0 +1,25 @@
+<div id="app">
+    {{fullName}}
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        data: {
+            firstName: "Alice",
+            lastName: "Chen",
+        },
+        computed: {
+            fullName: {
+                get: function() {
+                    return this.firstName + " " + this.lastName;
+                },
+                set: function(newValue) {
+                    let names = newValue.split(' ');
+                    this.firstName = names[0];
+                    this.lastName = names[1];   
+                }
+            }
+        }
+    })
+</script>

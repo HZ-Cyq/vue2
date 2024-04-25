@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple el-input Example</title>
+  <!-- 引入 Element UI 的样式文件 -->
+</head>
+
+<body>
+  <div id="app">
+    <!-- 使用 el-input 组件 -->
+    <el-input v-model="param.inputValue" placeholder="请输入内容" @input="handleInput"></el-input>
+    <!-- 显示输入框的内容 -->
+    <p>输入框的内容为: {{ param.inputValue }}</p>
+  </div>
+
+  <!-- 引入 Vue.js 和 Element UI 的 JavaScript 文件 -->
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+ 
+ <script>
+    new Vue({
+      el: '#app',
+      data: {
+        param: {inputValue: ''}
+      },
+      methods: {
+        handleInput(value) {
+        console.log('输入框内容变化：', value);
+      // 执行其他逻辑...
+      }
+  }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./node_modules/element-ui/lib/theme-chalk/index.css">
+  <title>Simple el-input Example</title>
+  <!-- 引入 Element UI 的样式文件 -->
+</head>
+
+<body>
+  <div id="app">
+    <div>
+        <el-input v-model="colorValue" placeholder="请输入颜色" @focus="showColorPicker"></el-input>
+        <p>选中的颜色值为: {{ colorValue }}</p>
+        <el-color-picker v-model="colorValue" :show-alpha="true" ref="colorPicker"></el-color-picker>
+      </div>
+  </div>
+
+  <!-- 引入 Vue.js 和 Element UI 的 JavaScript 文件 -->
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+ 
+ <script>
+    new Vue({
+      el: '#app',
+      data: {
+        colorValue: ''
+      }, // 设置默认颜色值
+      methods: {
+        showColorPicker() {
+      // 手动触发颜色选择器的显示
+      this.$refs.colorPicker.$el.querySelector('.el-input').focus();
+    }
+  }
+    });
+  </script>
+</body>
+
+</html>
