@@ -1,0 +1,17 @@
+<div id="app">
+    <button v-on:click="changeValue()">ALTERAR</button>
+    <div>{{menuOpen}}</div>
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script>
+    let vm = new Vue({
+        el:"#app",
+        props: [ 'menuOpen' ],
+        methods: {
+            changeValue() {
+                this.menuOpen = !this.menuOpen;
+                console.log(this.menuOpen);
+            }
+        },
+    });    
+</script>

@@ -1,0 +1,25 @@
+<div id="app">
+    <div v-for="(color, index) in colors" :key = index>
+        <input type="radio" :id="'color' + index" name="color" :value="color" v-model="selectedColor"/>
+        <label for="'color' + index">{{color}}</label>
+    </div>
+</div>
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script>
+    // 单选框测试
+    let vm = new Vue({
+        el:"#app",
+        data() {
+            return {
+                colors:["Red", "Blue", "White"],
+                selectedColor:"Blue",
+            };
+        },
+        watch:{
+            selectedColor(newValue, oldValue) {
+                console.log(oldValue + "-->" + newValue);
+            }
+        }
+    });    
+    ds
+</script>
