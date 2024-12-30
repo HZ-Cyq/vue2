@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <template id="my-template">
+            <div>444</div>
+            <div>555</div>
+            <div>666</div>
+        </template>
+        <div id="app">
+            <div>111</div>
+            <div>222</div>
+            <div>333</div>
+        </div>
+        <script>
+            // template标签默认是隐藏的，如果不执行下面的js代码，template标签里的内容就不会显示
+            let myTemplate = document.querySelector("#my-template");
+            let app = document.querySelector("#app");
+            let cloneNode = myTemplate.content.cloneNode(true);
+            app.appendChild(cloneNode);
+            // 执行完后，app里会有6个同级的div
+        </script>
+    </body>
+</html>

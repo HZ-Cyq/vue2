@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+        <div id="app">
+            <ul>
+                <li v-for="item in array" v-bind:key="item.message">
+                    {{item.message}}
+                </li>  
+            </ul>
+            <!-- 可以添加一个index索引 -->
+            <ul>
+                <li v-for="item, index in array" v-bind:key="item.message">
+                    {{index}}:{{item.message}}
+                </li>
+            </ul>
+            <!-- 可以使用of代替in -->
+            <ul>
+                <li v-for="item of array" v-bind:key="item.message">
+                    {{item.message}}
+                </li>
+            </ul>
+        </div>
+    </head>
+    <body>
+        <script>
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    array: [
+                        {
+                            message:"Foo",
+                        },
+                        {
+                            message:"Bar",
+                        }
+                    ],
+                }
+            });
+        </script>
+    </body>
+</html>

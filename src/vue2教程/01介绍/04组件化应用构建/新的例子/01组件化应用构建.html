@@ -1,0 +1,17 @@
+<!--
+    参考：https://blog.csdn.net/weixin_41430914/article/details/104838637
+    1、Vue.componet方法注册组件
+    2、实例化Vue
+-->
+<div id="app">
+    <claw></claw>
+</div>
+<script src = "https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    Vue.component('claw', {
+        template: `<h1>claw的自定义组件</h1>`
+    });
+    const app = new Vue({
+        el: "#app",
+    })
+</script>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    <script src="../../modules/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <ul>
+            <li v-for="item in 5" v-bind:key="item">
+                {{item}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        let vue = new Vue({
+            el:"#app",
+        });
+    </script>  
+</body>
+</html>

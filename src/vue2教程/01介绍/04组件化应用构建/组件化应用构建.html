@@ -1,9 +1,9 @@
 <!-- <div id="app" style="display: flex;"> -->
 <div id="app" style="display: flex;">
     <todo-item v-for="item in groceryList" v-bind:todo="item" v-bind:key="item.id"></todo-item>
-    <div v-for="item in groceryList">
+    <!-- <div v-for="item in groceryList">
         <todo-item ></todo-item>
-    </div>
+    </div> -->
 </div>
 <script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
@@ -19,7 +19,7 @@
         // `
          template: `
             <div>
-                {{todo.text}}
+                {{todo}}
             </div>
          `
     })

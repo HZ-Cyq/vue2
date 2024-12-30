@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <template v-if="type === 'userName'">
+                用户名：<input type="text" placeholder="请输入用户名" key="userName"/>
+            </template>
+            <template v-else>
+                用户邮箱：<input type="text" placeholder="请输入邮箱" key="email"/>
+            </template>
+        </div>
+        <script>
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    type:"userName",
+                }
+            })
+        </script>
+    </body>
+</html>

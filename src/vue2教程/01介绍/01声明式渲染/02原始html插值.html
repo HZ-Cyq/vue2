@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src = "../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id = "app">
+            <div>{{ message }}</div>
+            <div v-html="message"></div>
+        </div>
+        <script>
+            let app = new Vue({
+                el: "#app",
+                data: {
+                    message: '<a href="https://cn.vuejs.org/">vue官网</a>'
+                }
+            });
+            console.log("创建app成功")
+        </script>
+    </body>
+</html>

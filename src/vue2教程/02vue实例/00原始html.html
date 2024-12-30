@@ -1,10 +1,13 @@
 <div id="app">
-    {{a}}
-    {{b}}
+    {{rawHtml}}
+    <div v-html="rawHtml"></div>
+    <span style="color:red">this should be red</span> 
 </div>
 <script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
-    var data = {a:1,b:10}
+    var data = {
+      rawHtml: '<span style="color:red">this should be red</span>', 
+    }
     var vm = new Vue({
         el:"#app",
         data: data,

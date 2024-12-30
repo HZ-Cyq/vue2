@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <script src = "../modules/vue.js"></script>
+    <div id="app">
+        <span v-bind:title="title">Hello world</span>
+        <div v-if="show">这段内容根据show字段显示</div>
+    </div>
+</head>
+<body>
+    <span title="这是一个span语句">hello world</span>
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data: {
+                title: "这是一个span语句, 该信息是通过v-title语句挂载到sapn标签里的,页面加载于" + new Date().toLocaleString(),
+                show: true,
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            {{number + 1}}
+        </div>
+        <script>
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    number: 10,
+                }
+            })
+        </script>
+    </body>
+</html>

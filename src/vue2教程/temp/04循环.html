@@ -1,0 +1,14 @@
+<div id="app">
+    <div v-for="item in list">
+        {{item}}
+    </div>
+</div>
+<script src = "https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    const app = new Vue({
+        el: "#app",
+        data: {
+            list: [1, 2, 3, 4],
+        },
+    });
+</script>

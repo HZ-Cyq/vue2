@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<div id="app">
+     <claw v-bind:propitem="item"></claw>
+</div>
+<script src = "https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    Vue.component("claw", {
+        props:['propitem'],
+        template: `<h1>{{propitem}}</h1>`
+    });
+    const app = new Vue({
+        el: "#app",
+        data: {
+            item: "hello vue",
+        }
+    });
+</script>

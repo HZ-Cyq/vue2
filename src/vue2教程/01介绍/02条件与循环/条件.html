@@ -1,12 +1,34 @@
 <div id="app3">
-    <p v-if="seen">现在看到我了吧</p>
+    <p v-if="param1 === 'a'">param1的值是a, 可以看到我</p>
+    <p v-else-if="param1 === 'b'"> param1的值是b,可以看到我</p>
+    <!-- v-else指令只能搭配v-if指令-->
+    <p v-else>param1的值不是a,也不是b,可以看到我</p>
+    
+    <!--  -->
+    <template v-if="seen">
+        <div>seen的值是true可以看到我</div>
+        <div>seen的值是true可以看到我</div>
+        <div>seen的值是true可以看到我</div>
+    </template>
+    <template v-else>
+        <div>seen的值不是true可以看到我</div>
+        <div>seen的值不是true可以看到我</div>
+        <div>seen的值不是true可以看到我</div>
+    </template>
+    
+    <!-- template标签不支持v-show(将上面的v-if改成v-show开关不生效) -->
+    <div v-show="isShow">isShow的值是true可以看到我</div>
+    <div v-show="!isShow">isShow的值是false可以看到我</div>
+
 </div>
 <script src="https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
     const app4 = new Vue({
         el:"#app3",
         data:{
-            seen:true,
+            param1: "a",
+            seen: true,
+            isShow: true,
         },
     })
 </script>

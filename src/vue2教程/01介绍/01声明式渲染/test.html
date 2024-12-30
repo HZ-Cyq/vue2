@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id = "app">
+            <div v-for="(item, index) in items">
+                {{index}}:{{item}}
+            </div>
+        </div>
+        <script>
+            let app = new Vue({
+                el: "#app",
+                data: {
+                    items:[111,222,333]
+                }
+            })
+        </script>
+    </body>
+</html>

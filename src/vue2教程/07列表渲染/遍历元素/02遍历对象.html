@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+        <div id="app">
+            <ul>
+                <li v-for="value in object">
+                    {{value}}
+                </li>
+            </ul>
+            <ul>
+                <li v-for="value,key,index in object">
+                    {{key}}:{{value}}:{{index}}
+                </li>
+            </ul>
+        </div>
+    </head>
+    <body>
+        <script>
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    object: {
+                        key1:"aaa",
+                        key2:"bbb",
+                        key3:"ccc",
+                    },
+                }
+            });
+        </script>
+    </body>
+</html>

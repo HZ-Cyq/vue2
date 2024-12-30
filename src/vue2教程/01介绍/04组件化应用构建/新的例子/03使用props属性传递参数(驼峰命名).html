@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<div id="app">
+     <claw v-bind:prop-item="item"></claw>
+</div>
+<script src = "https://gcore.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    Vue.component("claw", {
+        props:['propItem'],
+        template: `<h1>{{propItem}}</h1>`
+    });
+    const app = new Vue({
+        el: "#app",
+        data: {
+            item: "hello vue",
+        }
+    });
+</script>
