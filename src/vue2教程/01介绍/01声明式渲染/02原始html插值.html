@@ -9,13 +9,15 @@
             <div v-html="message"></div>
         </div>
         <script>
-            let app = new Vue({
+            let vue = new Vue({
                 el: "#app",
                 data: {
                     message: '<a href="https://cn.vuejs.org/">vue官网</a>'
                 }
             });
             console.log("创建app成功")
+            // vue实例会挂载到app dom中
+            console.log(app.__vue__ === vue);
         </script>
     </body>
 </html>

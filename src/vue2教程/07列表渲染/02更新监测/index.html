@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            {{items1}}
+            <br />
+            {{items2}}
+        </div>
+        <script>
+            let vue = new Vue({
+                el:"#app",
+                data: {
+                    items1:["111", "222", "333","444","555","666"],
+                    items2: {
+                        property1:"111",
+                        property2:"222",
+                        property3:"333",
+                    }
+                },
+                methods: {
+                    /***********更新数组**************/ 
+                    changeItems1WithFunc1() {
+                        // 使用方法更新，vue可以监测到
+                        this.items1.unshift("000");
+                        return this.items1;
+                    },
+                    changeItems1WithFunc2() {
+                        // 使用方法更新，vue可以监测到
+                        this.items1 = ["222", "333", "444"];
+                        return this.items1;
+                    },
+                    changeItems1WithNativeFunc1() {
+                        // 使用原生方法更新，vue监测不到
+                        this.items1[0] = "222";
+                        return this.items1;
+                    },
+                    changeItems1WithNativeFunc2() {
+                        // 使用原生方法更新，vue监测不到
+                        this.items1.length = 2;
+                        return this.items1;
+                    },
+
+                    
+                    /***********更新对象**************/ 
+                    updateExistingProperty() {
+                        // 更新已有的属性，可以监测
+                        this.items2.property1 = "aaa";
+                        return this.items2;
+                    },
+                    addNewProperty() {
+                        // 新加属性，监测不到
+                        this.items2.property4 = "bbb";
+                        return this.items2;
+                    },
+                    deleteProperty() {
+                        // 删除属性，监测不到
+                        delete this.items2.property1;
+                        return this.items2;
+                    },
+                    addNewPropertyWithVueSet() {
+                        // 使用Vue.set方法添加属性，可以监测
+                        Vue.set(this.items2, "property4", "444");
+                        return this.items2;
+                    },
+                    deletePropertyWithVueDelete() {
+                        // 使用Vue.delete方法删除属性，可以监测
+                        Vue.delete(this.items2, "property3");
+                        return this.items2;
+                    },
+                }
+            })
+        </script>
+    </body>
+</html>

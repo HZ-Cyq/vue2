@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>显示过滤排序后的结果</title>
+        <meta charset="UTF-8"></meta>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <!-- 使用方法过滤 -->
+            <div v-for="(item, index) in filterItems(items)">
+                {{index}}--{{item}}
+            </div>
+            <br />
+            <!-- 使用计算属性过滤，不适用v-for嵌套循环的情况-->
+             <div v-for="(item, index) in filterItemsComPro">
+                {{index}}--{{item}}
+             </div>
+        </div>
+        <script>
+            let vue = new Vue({
+                el: "#app",
+                data: {
+                    items: [1,2,3,4,5,6,7],
+                },
+                methods: {
+                    filterItems(items) {
+                        return items.filter(ele => ele > 4);
+                    }
+                },
+                computed: {
+                    filterItemsComPro:function() {
+                        return this.filterItems(this.items);
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
