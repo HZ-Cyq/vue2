@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>通过prop向子组件传递数据</title>
+        <meta charset="utf-8"></meta>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <my-item title="111"></my-item>
+            <my-item title="222"></my-item>
+        </div>
+        <script>
+            Vue.component("my-item", {
+               props: ["title"],
+               template: `<h3>{{title}}</h3>`
+            });
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    aa:111,
+                }
+            });
+        </script>
+    </body>
+</html>

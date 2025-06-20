@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>组件基础</title>
+        <meta charset="UTF-8"></meta>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="components-demo">
+            方法getNow的值：{{ getNow() }}<br>
+            计算属性now的值：{{ now }}<br>
+            data里的值：{{ aa }}<br>
+        </div>
+        <script>
+            // 在控制台通过vue.aa = "222"修改data的值
+            // 触发了vue的更新，方法getNow的值会变化，计算属性now的值不会变
+            let vue = new Vue({
+                el: "#components-demo",
+                data: {
+                    aa:"111"
+                },
+                computed: {
+                    now() {
+                        return Date.now();
+                    }
+                },
+                methods: {
+                    getNow() {
+                        return Date.now();
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

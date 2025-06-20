@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>计算属性的setter和getter</title>
+        <meta charset="utf-8"></meta>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <p>名：<input v-model="firstName"></p>
+            <p>姓：<input v-model="lastName"></p>
+            <p>全名1：<input v-model="fullName1"></p>
+            <p>全名2：<input v-model="fullName2"></p>
+        </div>
+        <script>
+            // 修改全名2的值，名和姓也会发生对应的变化
+            let vue = new Vue({
+                el: "#app",
+                data: {
+                    firstName: "Christian",
+                    lastName: "Chen",
+                },
+                computed: {
+                    fullName1() {
+                        return this.firstName + " " + this.lastName; 
+                    },
+                    fullName2: {
+                        get() {
+                            return this.firstName + " " + this.lastName
+                        },
+                        set(newVal) {
+                            let split = newVal.split(" ");
+                            this.firstName = split[0];
+                            this.lastName = split[1];
+                        }
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenLayers + Modify 示例</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+  <script>
+    const center = ol.proj.fromLonLat([116.397, 39.908]);
+
+    // 初始化地图
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        })
+      ],
+      view: new ol.View({
+        center: center,
+        zoom: 10
+      })
+    });
+
+    // 创建一个 Feature（标记点）
+    const marker = new ol.Feature({
+      geometry: new ol.geom.Point(center)
+    });
+
+    marker.setStyle(new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 1],
+        src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+      })
+    }));
+
+    // 👉 使用 ol.Collection 管理 Feature
+    const features = new ol.Collection([marker]);
+
+    const vectorSource = new ol.source.Vector({
+      features: features
+    });
+
+    const vectorLayer = new ol.layer.Vector({
+      source: vectorSource
+    });
+
+    map.addLayer(vectorLayer);
+
+    // 👉 添加 Modify 交互：可以拖动图形
+    const modify = new ol.interaction.Modify({
+      features: features
+    });
+
+    map.addInteraction(modify);
+  </script>
+</body>
+</html>

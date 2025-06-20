@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+        <meta charset="UTF-8"></meta>
+        <title>组件复用测试</title>
+    </head>
+    <body>
+        <div id="app">
+            <my-item></my-item>
+            <my-item></my-item>
+        </div>
+        <script>
+            Vue.component("my-item", {
+               data: function(){
+                    return {
+                        times: 0
+                    }
+               },
+               template: `<button v-on:click=times++>click me {{times}}</button>`,
+            });
+            let vue = new Vue({
+                el:"#app",
+                data: {
+                    aa: 11,
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -6,23 +6,38 @@
     </head>
     <body>
         <div id="app">
-            {{message}}
+            <ul>
+                <li is="my-item-todo" v-for="(todo, index) in todos" v-bind:key="todo.id" v-bind:title="todo.title" v-on:remove="todos.splice(index, 1)">
+                </li>
+            </ul>
         </div>
         <script>
-            Vue.component("to-do-items", {
-                data: function(){
-                    let data = {
-                        count:0,
-                    }
-                    return data
-                },
-                template: '<li></li>'
-            });
-            let vue = new Vue({
-              el:"#app",
-              data: {
-                message:"hello world",
-              },
+            Vue.component("my-item-todo", {
+                // props是父组件传入的
+                props: ["title"],
+                // 这里面的Remove方法也相当于是父组件传入的
+                template: '\
+                <li>\
+                    {{title}}\
+                    <button v-on:click="$emit(\'remove\')">Remove</button>\
+                </li>'
+            })
+            let app = new Vue({
+                el: "#app",
+                data: {
+                    todos:[{
+                        id: 1,
+                        title: "sleep",
+                    },
+                    {
+                        id: 2,
+                        title: "eat",
+                    },
+                    {
+                        id: 3,
+                        title: "learn",
+                    }]
+                }
             })
         </script>
     </body>
