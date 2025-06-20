@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MyComponent></MyComponent>
+    <!-- <MyComponent></MyComponent> -->
   </div>
 </template>
 
