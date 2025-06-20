@@ -12,10 +12,11 @@
         <span v-if="node.subMenu && node.subMenu.length"> ▶ </span>
       </div>
 
-      <!-- 子菜单递归展开 -->
+      <!-- 子菜单递归 -->
       <HoverTreeMenu
         v-if="hovered === node && node.subMenu && node.subMenu.length"
         :nodes="node.subMenu"
+        @component-selected="$emit('component-selected', $event)"
         class="submenu"
       />
     </li>
@@ -39,8 +40,11 @@ export default {
   methods: {
     onClick(node) {
       if (!node.subMenu || node.subMenu.length === 0) {
-        alert("点击叶子节点：" + node.title);
-        // 替换成 this.$router.push(...) 或动态加载组件等逻辑
+        if (node.componentName) {
+          this.$emit("component-selected", node.componentName);
+        } else {
+          alert("无 componentName：" + node.title);
+        }
       }
     },
   },
@@ -48,7 +52,6 @@ export default {
     HoverTreeMenu: null,
   },
   mounted() {
-    // 实现递归引用
     this.$options.components.HoverTreeMenu = this.$options;
   },
 };
@@ -77,7 +80,6 @@ export default {
   padding: 10px 15px;
   cursor: pointer;
   white-space: nowrap;
-  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
