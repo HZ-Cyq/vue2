@@ -1,16 +1,35 @@
 <template>
   <div class="line-editor-popover-container">
-    <el-table :data="lines" border style="width: 600px">
+    <el-table :data="lines" border style="width: 700px">
+      <!-- 线名称列 -->
       <el-table-column prop="name" label="线名称" width="120" />
+
+      <!-- 显示开关列 -->
+      <el-table-column label="显示" width="100">
+        <template v-slot="scope">
+          <el-switch
+            v-model="scope.row.visible"
+            active-color="#13ce66"
+            inactive-color="#ccc"
+          />
+        </template>
+      </el-table-column>
+
+      <!-- 操作列 -->
       <el-table-column label="操作">
         <template v-slot="scope">
           <el-popover
             placement="right"
-            width="300"
+            width="320"
             trigger="click"
             v-model="popoverVisible[scope.$index]"
           >
-            <div v-for="(item, idx) in scope.row.userData" :key="idx" class="subline-editor">
+            <!-- 弹窗内容：编辑所有子线 -->
+            <div
+              v-for="(item, idx) in scope.row.userData"
+              :key="idx"
+              class="subline-editor"
+            >
               <div class="subline-title">{{ item.name }}</div>
               <el-form label-width="60px" size="mini">
                 <el-form-item label="颜色">
@@ -33,6 +52,8 @@
               </el-form>
               <el-divider v-if="idx < scope.row.userData.length - 1" />
             </div>
+
+            <!-- 编辑按钮插槽 -->
             <el-button slot="reference" size="mini" type="primary">编辑</el-button>
           </el-popover>
         </template>
@@ -43,13 +64,14 @@
 
 <script>
 export default {
-  name: "LineEditorSinglePopover",
+  name: "LineEditor",
   data() {
     return {
       lines: [
         {
           key: "1",
           name: "弹道线",
+          visible: true,
           userData: [
             { name: "白方", color: "rgba(255,255,255,1)", width: 6, type: "实线" },
             { name: "红方", color: "rgba(255,0,0,1)", width: 6, type: "虚线" }
@@ -58,13 +80,14 @@ export default {
         {
           key: "2",
           name: "指挥线",
+          visible: true,
           userData: [
             { name: "指挥线", color: "rgba(0,0,255,1)", width: 6, type: "箭头线" }
           ]
         }
       ],
       rgbaColors: [],
-      popoverVisible: {} // 控制每行的 popover 显隐
+      popoverVisible: {} // 控制每行 popover 显隐
     };
   },
   mounted() {
@@ -94,9 +117,11 @@ export default {
 .line-editor-popover-container {
   padding: 20px;
 }
+
 .subline-editor {
   margin-bottom: 10px;
 }
+
 .subline-title {
   font-weight: bold;
   margin-bottom: 4px;
