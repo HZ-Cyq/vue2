@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <input v-on:keyup.enter="log('enter up')">
+            <br/>
+            <input v-on:keydown.enter="log('enter down')">
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    },
+                }
+            }); 
+        </script>
+    </body>
+</html>

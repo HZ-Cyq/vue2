@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>.passive 滚动流畅度对比测试</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 15px;
+      background: #f8f9fa;
+      margin: 0;
+    }
+    .test-area {
+      width: 95vw;
+      max-width: 600px;
+      height: 40vh;
+      margin: 20px auto;
+      border: 3px solid;
+      overflow: auto;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-area.passive {
+      border-color: #4CAF50;
+    }
+    .test-area.normal {
+      border-color: #f44336;
+    }
+    .content {
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .label {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 8px;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h2>🟢 用了 .passive（应更流畅）</h2>
+    <div class="test-area passive" @scroll.passive="handleScrollPassive">
+      <div class="label">.passive 区域（绿色边框）</div>
+      <div class="content" v-html="longText"></div>
+    </div>
+
+    <h2>🔴 没用 .passive（可能卡顿）</h2>
+    <div class="test-area normal" @scroll="handleScrollNormal">
+      <div class="label">普通区域（红色边框）</div>
+      <div class="content" v-html="longText"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #666;">
+      👉 请快速上下滚动两个区域，感受流畅度差异<br>
+      （建议在手机或 Chrome 模拟器中测试）
+    </div>
+  </div>
+
+  <script>
+    // 生成长文本
+    const paragraphs = Array.from({ length: 100 }, (_, i) => 
+      `<p>段落 ${i + 1}：这是测试内容。快速滚动时，注意观察是否跟手、是否掉帧。Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>`
+    ).join('');
+
+    new Vue({
+      el: '#app',
+      data: {
+        longText: paragraphs
+      },
+      methods: {
+        // 模拟中等强度计算（约 10~20ms）
+        simulateWork() {
+          let x = 0;
+          for (let i = 0; i < 2_000_000; i++) {
+            x += Math.sin(i) * Math.cos(i);
+          }
+          return x;
+        },
+
+        handleScrollPassive() {
+          this.simulateWork(); // 虽然 JS 忙，但滚动不等它
+        },
+
+        handleScrollNormal() {
+          this.simulateWork(); // 滚动必须等这个函数跑完
+        }
+      }
+    });
+  </script>
+</body>
+</html>

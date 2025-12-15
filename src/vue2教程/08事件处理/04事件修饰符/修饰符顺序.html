@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>修饰符顺序对比</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <style>
+    .outer {
+      width: 300px;
+      padding: 20px;
+      background: #e3f2fd;
+      border: 2px solid #2196f3;
+      margin: 20px;
+      cursor: pointer;
+    }
+    .inner {
+      padding: 15px;
+      background: #bbdefb;
+      border: 1px dashed #1976d2;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    a {
+      display: block;
+      margin-top: 10px;
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <!-- 情况1: @click.prevent.self -->
+    <div class="outer" @click.prevent.self="log('prevent.self')">
+      <strong>🔴 @click.prevent.self</strong>
+      <div class="inner">点击我（子元素）</div>
+      <a href="https://www.example.com" target="_blank">点我跳转（测试 prevent）</a>
+    </div>
+
+    <!-- 情况2: @click.self.prevent -->
+    <div class="outer" @click.self.prevent="log('self.prevent')">
+      <strong>🟢 @click.self.prevent</strong>
+      <div class="inner">点击我（子元素）</div>
+      <a href="https://www.example.com" target="_blank">点我跳转（测试 prevent）</a>
+    </div>
+
+    <div style="margin: 20px; padding: 10px; background: #f5f5f5;">
+      <h3>操作说明：</h3>
+      <ul>
+        <li>点击<strong>蓝色区域内部</strong>（子元素或链接）</li>
+        <li>点击<strong>蓝色边框区域**空白处**（即 outer 自身）</li>
+        <li>观察：链接是否跳转？控制台输出什么？</li>
+      </ul>
+      <p>日志：<br><span v-for="msg in logs" :key="msg">{{ msg }}<br></span></p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        logs: []
+      },
+      methods: {
+        log(msg) {
+          const time = new Date().toLocaleTimeString();
+          this.logs.unshift(`[${time}] ${msg}`);
+          if (this.logs.length > 10) this.logs.pop();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

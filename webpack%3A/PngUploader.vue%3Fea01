@@ -1,0 +1,65 @@
+<template>
+    <div class="png-uploader">
+      <el-upload
+        class="upload-demo1"
+        action=""
+        :show-file-list="false"
+        :before-upload="handleBeforeUpload"
+        accept=".png"
+      >
+        <el-button size="small" type="primary">点击上传 PNG 图片</el-button>
+      </el-upload>
+  
+      <div v-if="imageUrl" class="image-preview">
+        <p>图片预览：</p>
+        <img :src="imageUrl" alt="预览图片" />
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    data() {
+      return {
+        imageUrl: ''
+      };
+    },
+    methods: {
+      handleBeforeUpload(file) {
+        const isPng = file.type === 'image/png';
+        if (!isPng) {
+          this.$message.error('只能上传 PNG 格式的图片');
+          return false;
+        }
+  
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.imageUrl = e.target.result;
+        };
+        reader.readAsDataURL(file);
+  
+        // 阻止默认上传行为（因为我们只是本地展示）
+        return false;
+      }
+    }
+  };
+  </script>
+  
+  <style scoped>
+  .png-uploader {
+    margin: 20px;
+  }
+  .image-preview {
+    margin-top: 20px;
+  }
+  .image-preview img {
+    max-width: 300px;
+    border: 1px solid #ccc;
+    padding: 5px;
+  }
+  </style>
+  
+
+
+// WEBPACK FOOTER //
+// PngUploader.vue

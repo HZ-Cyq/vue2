@@ -21,39 +21,31 @@
             trigger="click"
             v-model="popoverVisible[scope.$index]"
           >
-            <div v-for="(item, idx) in scope.row.userData" :key="idx" class="subline-editor">
-              <div class="subline-title">{{ item.name }}</div>
-              <el-form label-width="60px" size="mini">
-                <el-form-item label="颜色">
-                  <el-color-picker
-                    v-model="item.color"
-                    show-alpha
-                  />
-                </el-form-item>
-                <el-form-item label="宽度">
-                  <el-input-number v-model="item.width" :min="1" />
-                </el-form-item>
-                <el-form-item label="类型">
-                  <el-select v-model="item.type" placeholder="选择类型">
-                    <el-option label="实线" value="实线" />
-                    <el-option label="虚线" value="虚线" />
-                    <el-option label="箭头线" value="箭头线" />
-                  </el-select>
-                </el-form-item>
-              </el-form>
+            <!-- 蓝色背景内容区 -->
+            <div class="popover-body">
+              <div
+                v-for="(item, idx) in scope.row.userData"
+                :key="idx"
+                class="subline-editor"
+              >
+                <div class="subline-title">{{ item.name }}</div>
+                <el-form label-width="60px" size="mini">
+                  <el-form-item label="颜色">
+                    <div class="color-reset-line">
+                      <el-color-picker v-model="item.color" show-alpha />
+                      <el-button
+                        type="danger"
+                        size="mini"
+                        @click="resetSubLine(scope.$index, idx)"
+                      >
+                        重置此项
+                      </el-button>
+                    </div>
+                  </el-form-item>
+                </el-form>
 
-              <!-- 每个子线重置按钮 -->
-              <div style="text-align: right; margin-bottom: 10px;">
-                <el-button
-                  type="danger"
-                  size="mini"
-                  @click="resetSubLine(scope.$index, idx)"
-                >
-                  重置此项
-                </el-button>
+                <el-divider v-if="idx < scope.row.userData.length - 1" />
               </div>
-
-              <el-divider v-if="idx < scope.row.userData.length - 1" />
             </div>
 
             <el-button slot="reference" size="mini" type="primary">编辑</el-button>
@@ -75,12 +67,32 @@ export default {
           name: "弹道线",
           visible: true,
           userData: [
-            { name: "白方", color: "rgba(255,255,255,1)", width: 6, type: "实线" },
-            { name: "红方", color: "rgba(255,0,0,1)", width: 6, type: "虚线" }
+            {
+              name: "白方",
+              color: "rgba(255,255,255,1)",
+              width: 6,
+              type: "实线"
+            },
+            {
+              name: "红方",
+              color: "rgba(255,0,0,1)",
+              width: 6,
+              type: "虚线"
+            }
           ],
           defaultData: [
-            { name: "白方", color: "rgba(255,255,255,1)", width: 6, type: "实线" },
-            { name: "红方", color: "rgba(255,0,0,1)", width: 6, type: "虚线" }
+            {
+              name: "白方",
+              color: "rgba(255,255,255,1)",
+              width: 6,
+              type: "实线"
+            },
+            {
+              name: "红方",
+              color: "rgba(255,0,0,1)",
+              width: 6,
+              type: "虚线"
+            }
           ]
         },
         {
@@ -88,10 +100,20 @@ export default {
           name: "指挥线",
           visible: true,
           userData: [
-            { name: "指挥线", color: "rgba(0,0,255,1)", width: 6, type: "箭头线" }
+            {
+              name: "指挥线",
+              color: "rgba(0,0,255,1)",
+              width: 6,
+              type: "箭头线"
+            }
           ],
           defaultData: [
-            { name: "指挥线", color: "rgba(0,0,255,1)", width: 6, type: "箭头线" }
+            {
+              name: "指挥线",
+              color: "rgba(0,0,255,1)",
+              width: 6,
+              type: "箭头线"
+            }
           ]
         }
       ],
@@ -101,8 +123,11 @@ export default {
   methods: {
     resetSubLine(lineIndex, subIndex) {
       const defaultItem = this.lines[lineIndex].defaultData[subIndex];
-      // 用深拷贝防止引用问题
-      this.$set(this.lines[lineIndex].userData, subIndex, JSON.parse(JSON.stringify(defaultItem)));
+      this.$set(
+        this.lines[lineIndex].userData,
+        subIndex,
+        JSON.parse(JSON.stringify(defaultItem))
+      );
     }
   }
 };
@@ -112,11 +137,43 @@ export default {
 .line-editor-popover-container {
   padding: 20px;
 }
+
 .subline-editor {
   margin-bottom: 10px;
 }
+
 .subline-title {
   font-weight: bold;
   margin-bottom: 4px;
+}
+
+.color-reset-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.popover-body {
+  background-color: #e0f0ff;
+  padding: 12px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+</style>
+
+<!-- 全局样式覆盖 el-popover 的默认白色背景 -->
+<style>
+/* 强制设置 el-popover 所有内部容器背景为蓝色 */
+.el-popover,
+.el-popover__content,
+.el-popover__inner,
+.el-popper .el-popover__content {
+  background-color: #e0f0ff !important;
+  border: none !important;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  overflow: hidden;
 }
 </style>

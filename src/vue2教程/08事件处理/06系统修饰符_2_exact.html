@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <!-- ctrl和其他的按键如shift或alt一起被按下也会触发 -->
+            <button v-on:click.ctrl="log('ctrl修饰符')">.ctrl修饰符</button>
+            <!-- 当前仅当ctrl被按下时才会触发 -->
+            <button v-on:click.ctrl.exact="log('ctrl修饰符')">.ctrl.exact修饰符</button>
+            <!-- 当前仅当没有按系统修饰符才会触发 -->
+            <button v-on:click.exact="log('ctrl修饰符')">click.exact修饰符</button>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0,
+                    inputVal: 'input val'
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    },
+                },
+            }); 
+        </script>
+    </body>
+</html>

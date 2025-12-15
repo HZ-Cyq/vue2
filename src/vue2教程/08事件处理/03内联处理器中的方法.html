@@ -1,0 +1,28 @@
+
+<!-- 内联处理器就是在v-on:（或@）后面直接写javascript代码片段（如函数调用、表达式），而不是只写一个方法名 -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+        <button v-on:click="onButtonClick(1)"> click me add 1</button>
+        <button v-on:click="onButtonClick(2)"> click me add 2</button>
+        <p> The button above has been clicked {{ counter}} times</p>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    onButtonClick(addVal, event) {
+                        this.counter += addVal;
+                    },
+                }
+            }); 
+        </script>
+    </body>
+</html>

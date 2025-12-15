@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <button v-on:click.once="log('点击')"> click me</button>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    }
+                }
+            }); 
+        </script>
+    </body>
+</html>

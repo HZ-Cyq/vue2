@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <input v-model="textVal">
+            <p> {{ textVal }}</p>
+            <textarea v-model="textAreaVal"></textarea>
+            <p>{{ textAreaVal }}</p>
+            <div>
+                <input type="checkbox" id="targetType" v-model="targetType">
+                <label for="targetType">targetType</label>
+                <input type="checkbox" id="leftFlowTime" v-model="targetType">
+                <label for="leftFlowTime">leftFlowTime</label>
+                <input type="checkbox" id="targetValue" v-model="targetType">
+                <label for="targetValue">targetValue</label>
+            </div>
+        </div>
+        <script>
+            let app = new Vue({
+                el:"#app",
+                data: {
+                    textVal:"place enter",
+                    textAreaVal: "place enter"
+                }
+            })
+        </script>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+        <button v-on:click="onButtonClick"> click me1 </button>
+        <button v-on:click="onButtonClick2"> click me2 </button>
+        <p> The button above has been clicked {{ counter}} times</p>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    onButtonClick(event) {
+                        this.counter += 1;
+                    },
+                }
+            }); 
+        </script>
+    </body>
+</html>

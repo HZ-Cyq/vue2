@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div v-on:click="onDivClick()">
+                <!--  添加了sopt修饰符，点击这里，不会触发外层的onDivClick方法-->
+                <button v-on:click.stop="onButtonClick(1)"> click me add 1</button>
+                <!--  点击这里，会触发onDivClick方法-->
+                <button v-on:click="onButtonClick(2)"> click me add 2</button>
+                <p> The button above has been clicked {{ counter}} times</p>
+            </div>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    onButtonClick(addVal, event) {
+                        this.counter += addVal;
+                    },
+                    onDivClick() {
+                        console.log("onDivClick");
+                    }
+                }
+            }); 
+        </script>
+    </body>
+</html>

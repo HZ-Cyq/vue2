@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div v-on:click.self="log('外层')">
+                <button v-on:click="log('内层')"> click me</button>
+            </div>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    }
+                }
+            }); 
+        </script>
+    </body>
+</html>

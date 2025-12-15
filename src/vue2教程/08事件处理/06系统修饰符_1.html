@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <!-- 在输入框中输入'alt + c'会清空该输入框的内容 -->
+            <input v-model="inputVal" v-on:keyup.alt.67="clearInput">
+            <div v-on:click.ctrl="log('click + ctrl')">aaa</div>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0,
+                    inputVal: 'input val'
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    },
+                    clearInput() {
+                        this.inputVal = "";
+                    }
+                },
+            }); 
+        </script>
+    </body>
+</html>

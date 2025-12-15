@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <form v-on:submit.prevent="log('表单提交了（.prevent）')">
+                <button type="submit">提交表单(.prevent)</button>
+            </form>
+            <form v-on:submit="log('表单提交了(没有prevent)')">
+                <button type="submit">提交表单(没有prevent)</button>
+            </form>
+        </div>
+        <script>
+            let example = new Vue({
+                el: "#app",
+                data: {
+                    counter: 0
+                },
+                methods: {
+                    log(message) {
+                        console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                    }
+                }
+            }); 
+        </script>
+    </body>
+</html>

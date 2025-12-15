@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="../../modules/vue.js"></script>
+    <style>
+        .box {
+            padding: 20px;
+            margin: 10px;
+            border: 2px solid #ccc;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="box" style="height: 100px; overflow: auto;" @scroll.passive="onScroll">
+            <p style="height: 300px; padding: 10px;">
+                请滚动这段内容。使用了 <code>.passive</code>，滚动更流畅。
+                （打开浏览器控制台查看日志）
+            </p>
+        </div>
+    </div>
+    <script>
+        let example = new Vue({
+            el: "#app",
+            data: {
+                counter: 0
+            },
+            methods: {
+                onScroll() {
+                    // 注意：在 .passive 监听器中调用 preventDefault() 会被忽略！
+                    // event.preventDefault(); // ❌ 无效，且浏览器可能警告
+                    this.log('滚动中（.passive）');
+                },
+                log(message) {
+                    console.log(`${new Date().toLocaleTimeString()}:${message}`);
+                }
+            }
+        }); 
+    </script>
+</body>
+
+</html>
