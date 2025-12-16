@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../modules/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            {{ name }}
+            <input v-model=""></input>
+        </div>
+        <script>
+            let vue = new Vue({
+                el:"#app",
+                data: {
+                  name:"aaa",  
+                },
+                methods: {
+
+                }
+            });
+        </script>
+    </body>
+</html>

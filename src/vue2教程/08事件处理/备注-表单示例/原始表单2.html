@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML 表单学习示例</title>
+
+  <style>
+    /* '*'代表所有元素，box-sizing代表width和height代 内容 + 内边距 + 边框 的值*/
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .form-container {
+      width: 400px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    /* 仅对文本类控件设置 100% 宽度 */
+    input[type="text"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 6px;
+    }
+
+    .radio-group label,
+    .checkbox-group label {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 12px;
+      font-weight: normal;
+    }
+
+    .radio-group input,
+    .checkbox-group input {
+      margin-right: 4px;
+    }
+
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="form-container">
+    <h2>用户信息表单</h2>
+
+    <!-- 使用 GET 更利于学习和调试 -->
+    <form method="get">
+
+      <div class="form-group">
+        <label for="username">用户名</label>
+        <input type="text" id="username" name="username" placeholder="请输入用户名">
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input type="password" id="password" name="password">
+      </div>
+
+      <div class="form-group">
+        <!-- 告诉浏览器这是一组相关表单项的语义 -->
+        <fieldset>
+          <legend>性别</legend>
+          <div class="radio-group">
+            <label for="gender-male">
+              <input id="gender-male" type="radio" name="gender" value="male"> 男
+            </label>
+            <label for="gender-female">
+              <input id="gender-female" type="radio" name="gender" value="female"> 女
+            </label>
+            <label for="gender-none">
+              <input id="gender-none" type="radio" name="gender" value=""> 不透露
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="form-group">
+        <label for="city">城市</label>
+        <select id="city" name="city">
+          <option value="">请选择</option>
+          <option value="beijing">北京</option>
+          <option value="shanghai">上海</option>
+          <option value="guangzhou">广州</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <fieldset>
+          <legend>兴趣爱好</legend>
+          <div class="checkbox-group">
+            <label for="hobby-reading">
+              <input id="hobby-reading" type="checkbox" name="hobby[]" value="reading"> 阅读
+            </label>
+            <label for="hobby-music">
+              <input id="hobby-music" type="checkbox" name="hobby[]" value="music"> 音乐
+            </label>
+            <label for="hobby-sports">
+              <input id="hobby-sports" type="checkbox" name="hobby[]" value="sports"> 运动
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="form-group">
+        <label for="remark">备注</label>
+        <textarea id="remark" name="remark" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">提交</button>
+        <button type="reset">重置</button>
+      </div>
+
+    </form>
+  </div>
+
+</body>
+</html>

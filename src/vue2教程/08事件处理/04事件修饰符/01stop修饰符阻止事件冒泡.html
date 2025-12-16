@@ -7,7 +7,7 @@
     <body>
         <div id="app">
             <div v-on:click="onDivClick()">
-                <!--  添加了sopt修饰符，点击这里，不会触发外层的onDivClick方法-->
+                <!--  添加了stop修饰符，点击这里，不会触发外层的onDivClick方法-->
                 <button v-on:click.stop="onButtonClick(1)"> click me add 1</button>
                 <!--  点击这里，会触发onDivClick方法-->
                 <button v-on:click="onButtonClick(2)"> click me add 2</button>
