@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>input事件和change事件</title>
+        <meta charset="utf-8"></meta>
+    </head>
+    <body>
+        <div>
+            <input id="input"></input>
+        </div>
+        <script>
+            let htmlEle = document.getElementById("input");
+            htmlEle.addEventListener("change", event => {
+                console.log("change");
+            });
+
+            htmlEle.addEventListener("input", event => {
+                console.log('input');
+                
+            })
+        </script>
+    </body>
+</html>
