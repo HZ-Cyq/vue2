@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Select change 示例</title>
+</head>
+<body>
+
+  <label for="city">城市：</label>
+  <select id="city">
+    <option value="">请选择</option>
+    <option value="bj">北京</option>
+    <option value="sh">上海</option>
+    <option value="gz">广州</option>
+  </select>
+
+  <script>
+    const select = document.getElementById('city');
+
+    select.addEventListener('change', function (event) {
+      // 当前选中的值
+      const value = event.target.value;
+
+      // 当前选中的 option 文本
+      const text = event.target.options[event.target.selectedIndex].text;
+
+      // 当前选中的索引
+      const index = event.target.selectedIndex;
+
+      console.log('value:', value);
+      console.log('text:', text);
+      console.log('index:', index);
+    });
+  </script>
+
+</body>
+</html>

@@ -8,6 +8,22 @@
         <div>
             <input id="input"></input>
         </div>
+        <div>
+            <input id='man' name="gender" type="radio" value="man" checked="true">男</input>
+            <input id="felman" name="gender" type="radio" value="felman">女</input>
+        </div>
+        <div>
+            <input id='read' name="hobbies" type="checkbox" value="read" checked="true">阅读</input>
+            <input id="music" name="hobbies" type="checkbox" value="music">音乐</input>
+            <input id="sports" name="hobbies" type="checkbox" value="sports">运动</input>
+        </div>
+        <div>
+            <select id="city">
+                <option value="beijing">北京</option>
+                <option value="shanghai">上海</option>
+                <option value="shenzhen">深圳</option>
+            </select>
+        </div>
         <script>
             let htmlEle = document.getElementById("input");
             htmlEle.addEventListener("change", event => {
@@ -15,9 +31,28 @@
             });
 
             htmlEle.addEventListener("input", event => {
-                console.log('input');
+                console.log('input');                
+            })
+
+            let manHtml = document.getElementById("man");
+            manHtml.addEventListener("change", event=>{
+                console.log('manHtml listen change');
+                console.log(event.target.checked);
                 
             })
+
+            let musicHtml = document.getElementById("music");
+            musicHtml.addEventListener("change", event=>{
+                console.log("musicHtml change");
+                console.log(event.target.checked);
+            })           
+            
+            let cityHtml = document.getElementById("city");
+             cityHtml.addEventListener("change", event=>{
+                console.log("cityHtml change");
+                console.log(event.target.value);
+                
+            })           
         </script>
     </body>
 </html>
