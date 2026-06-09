@@ -6,10 +6,18 @@
       <div ref="trajChartRef" class="chart"></div>
     </div>
 
+    <!-- 多选框 -->
+    <div class="checkbox-group">
+      <label v-for="(item, index) in data" :key="index" class="checkbox-item">
+        <input type="checkbox" v-model="selectedIndexes" :value="index" />
+        <span>样本 {{ item.sampleIndex }}</span>
+      </label>
+    </div>
+
     <!-- 下部：拦截阵地甘特图 -->
-    <div class="chart-container">
-      <div class="chart-title">拦截阵地时序</div>
-      <div ref="ganttChartRef" class="chart"></div>
+    <div class="chart-container" v-for="(item, index) in visibleData" :key="index">
+      <div class="chart-title">拦截阵地时序 - 样本 {{ item.sampleIndex }}</div>
+      <div :ref="el => setGanttRef(el, index)" class="chart"></div>
     </div>
   </div>
 </template>
@@ -22,8 +30,11 @@ export default {
   data() {
     return {
       trajChart: null,
-      ganttChart: null,
+      ganttCharts: [],
+      ganttRefs: [],
       timeRange: { min: 0, max: 800 },
+      selectedIndexes: [0, 1],
+      isSyncing: false,
 
       // 数据
       data: [
@@ -63,9 +74,51 @@ export default {
               max_intercept_height: 8
             }
           }
+        },
+        {
+          sampleIndex: 3,
+          sample_base_info: '',
+          traj: [
+            ['traj_id', 'time', 'altitude'],
+            ['TSPI_MISSILE_10001', 1.0, 5.0],
+            ['TSPI_MISSILE_10001', 100.0, 10.0],
+            ['TSPI_MISSILE_10001', 200.0, 15.0],
+            ['TSPI_MISSILE_10001', 300.0, 20.0],
+            ['TSPI_MISSILE_10001', 400.0, 18.0],
+            ['TSPI_MISSILE_10001', 500.0, 25.0],
+            ['TSPI_MISSILE_10001', 600.0, 30.0],
+            ['TSPI_MISSILE_10001', 700.0, 6.0]
+          ],
+          ljzd: {
+            GPI_LAUNCHER_1: {
+              min_launch_time: 200,
+              max_launch_time: 300,
+              min_intercept_time: 400,
+              max_intercept_time: 500,
+              min_xj: 5,
+              max_xj: 6,
+              min_intercept_height: 7,
+              max_intercept_height: 8
+            },
+            GPI_LAUNCHER_2: {
+              min_launch_time: 200,
+              max_launch_time: 300,
+              min_intercept_time: 500,
+              max_intercept_time: 600,
+              min_xj: 5,
+              max_xj: 6,
+              min_intercept_height: 7,
+              max_intercept_height: 8
+            }
+          }
         }
       ]
     };
+  },
+  computed: {
+    visibleData() {
+      return this.selectedIndexes.map(i => this.data[i]);
+    }
   },
   mounted() {
     this.calculateTimeRange();
@@ -76,17 +129,24 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
     if (this.trajChart) this.trajChart.dispose();
-    if (this.ganttChart) this.ganttChart.dispose();
+    this.ganttCharts.forEach(chart => chart && chart.dispose());
   },
   methods: {
+    setGanttRef(el, index) {
+      if (el) {
+        this.ganttRefs[index] = el;
+      }
+    },
+
     initCharts() {
       this.trajChart = echarts.init(this.$refs.trajChartRef);
-      this.ganttChart = echarts.init(this.$refs.ganttChartRef);
+      this.ganttCharts = [];
+      this.ganttRefs = [];
     },
 
     handleResize() {
       if (this.trajChart) this.trajChart.resize();
-      if (this.ganttChart) this.ganttChart.resize();
+      this.ganttCharts.forEach(chart => chart && chart.resize());
     },
 
     calculateTimeRange() {
@@ -96,7 +156,6 @@ export default {
       let minTime = Infinity;
       let maxTime = -Infinity;
 
-      // 仅从轨迹数据计算时间范围
       if (sample.traj && sample.traj.length > 1) {
         for (let i = 1; i < sample.traj.length; i++) {
           const time = parseFloat(sample.traj[i][1]);
@@ -107,12 +166,10 @@ export default {
         }
       }
 
-      // 时间轴从0开始，最大值根据进攻弹最大时间
       this.timeRange.min = 0;
       this.timeRange.max = maxTime;
     },
 
-    // 计算高度范围
     calculateAltitudeRange() {
       const sample = this.data[0];
       if (!sample || !sample.traj) return { min: 0, max: 100 };
@@ -133,61 +190,72 @@ export default {
 
     renderCharts() {
       this.renderTrajChart();
-      this.renderGanttChart();
+      this.renderAllGanttCharts();
 
-      // 添加同步的缩放功能
-      const zoomOption = {
-        dataZoom: [
-          {
-            type: 'inside',
-            xAxisIndex: 0,
-            throttle: 50
+      // 监听ECharts内置的dataZoom事件实现同步
+      this.trajChart.on('datazoom', params => {
+        if (this.isSyncing) return;
+        this.isSyncing = true;
+        const batch = params.batch && params.batch[0];
+        const start = batch ? batch.start : params.start;
+        const end = batch ? batch.end : params.end;
+        if (start !== undefined && end !== undefined) {
+          this.ganttCharts.forEach(chart => {
+            chart.dispatchAction({
+              type: 'dataZoom',
+              dataZoomIndex: 0,
+              start: start,
+              end: end
+            });
+          });
+        }
+        this.$nextTick(() => { this.isSyncing = false; });
+      });
+
+      this.ganttCharts.forEach(chart => {
+        chart.on('datazoom', params => {
+          if (this.isSyncing) return;
+          this.isSyncing = true;
+          const batch = params.batch && params.batch[0];
+          const start = batch ? batch.start : params.start;
+          const end = batch ? batch.end : params.end;
+          if (start !== undefined && end !== undefined) {
+            this.trajChart.dispatchAction({
+              type: 'dataZoom',
+              dataZoomIndex: 0,
+              start: start,
+              end: end
+            });
+            this.ganttCharts.forEach(otherChart => {
+              if (otherChart !== chart) {
+                otherChart.dispatchAction({
+                  type: 'dataZoom',
+                  dataZoomIndex: 0,
+                  start: start,
+                  end: end
+                });
+              }
+            });
           }
-        ]
-      };
-
-      this.trajChart.setOption(zoomOption);
-      this.ganttChart.setOption(zoomOption);
-
-      // 绑定滚轮同步缩放
-      this.trajChart.getZr().on('mousewheel', params => {
-        this.syncZoom('trajChart', params.wheelDelta);
+          this.$nextTick(() => { this.isSyncing = false; });
+        });
       });
-      this.ganttChart.getZr().on('mousewheel', params => {
-        this.syncZoom('ganttChart', params.wheelDelta);
-      });
-    },
 
-    syncZoom(source, delta) {
-      const sourceChart = source === 'trajChart' ? this.trajChart : this.ganttChart;
-      const targetChart = source === 'trajChart' ? this.ganttChart : this.trajChart;
-
-      const options = sourceChart.getOption();
-      const zoom = options.dataZoom[0];
-      if (!zoom) return;
-
-      const percentWidth = targetChart.getWidth();
-      const range = zoom.end - zoom.start;
-      const deltaPercent = (delta / 500) * range;
-
-      let newStart = zoom.start - deltaPercent;
-      let newEnd = zoom.end - deltaPercent;
-
-      // 限制范围
-      if (newStart < 0) {
-        newStart = 0;
-        newEnd = range;
-      }
-      if (newEnd > 100) {
-        newEnd = 100;
-        newStart = 100 - range;
-      }
-
-      targetChart.dispatchAction({
-        type: 'dataZoom',
-        xAxisIndex: 0,
-        start: newStart,
-        end: newEnd
+      // 阻止原生滚轮事件冒泡
+      this.$nextTick(() => {
+        const trajDom = this.$refs.trajChartRef;
+        if (trajDom) {
+          trajDom.addEventListener('mousewheel', e => {
+            e.stopPropagation();
+          });
+        }
+        this.ganttRefs.forEach(dom => {
+          if (dom) {
+            dom.addEventListener('mousewheel', e => {
+              e.stopPropagation();
+            });
+          }
+        });
       });
     },
 
@@ -237,6 +305,11 @@ export default {
           max: altitudeRange.max,
           splitLine: { lineStyle: { type: 'dashed', color: '#e0e0e0' } }
         },
+        dataZoom: [{
+          type: 'inside',
+          xAxisIndex: 0,
+          throttle: 50
+        }],
         series: [
           {
             type: 'line',
@@ -259,8 +332,51 @@ export default {
       this.trajChart.setOption(option);
     },
 
-    renderGanttChart() {
-      const sample = this.data[0];
+    renderAllGanttCharts() {
+      this.ganttCharts.forEach(chart => chart && chart.dispose());
+      this.ganttCharts = [];
+
+      this.$nextTick(() => {
+        this.visibleData.forEach((item, index) => {
+          const dom = this.ganttRefs[index];
+          if (!dom) return;
+
+          const chart = echarts.init(dom);
+          this.ganttCharts.push(chart);
+          this.renderSingleGanttChart(chart, item);
+
+          // 绑定dataZoom同步事件
+          chart.on('datazoom', params => {
+            if (this.isSyncing) return;
+            this.isSyncing = true;
+            const batch = params.batch && params.batch[0];
+            const start = batch ? batch.start : params.start;
+            const end = batch ? batch.end : params.end;
+            if (start !== undefined && end !== undefined) {
+              this.trajChart.dispatchAction({
+                type: 'dataZoom',
+                dataZoomIndex: 0,
+                start: start,
+                end: end
+              });
+              this.ganttCharts.forEach(otherChart => {
+                if (otherChart !== chart) {
+                  otherChart.dispatchAction({
+                    type: 'dataZoom',
+                    dataZoomIndex: 0,
+                    start: start,
+                    end: end
+                  });
+                }
+              });
+            }
+            this.$nextTick(() => { this.isSyncing = false; });
+          });
+        });
+      });
+    },
+
+    renderSingleGanttChart(chart, sample) {
       if (!sample || !sample.ljzd) return;
 
       const launcherNames = Object.keys(sample.ljzd);
@@ -330,6 +446,11 @@ export default {
             formatter: params => params.name
           }
         },
+        dataZoom: [{
+          type: 'inside',
+          xAxisIndex: 0,
+          throttle: 50
+        }],
         series: [
           {
             name: '拦截时间',
@@ -382,7 +503,12 @@ export default {
         ]
       };
 
-      this.ganttChart.setOption(option);
+      chart.setOption(option);
+    }
+  },
+  watch: {
+    selectedIndexes() {
+      this.renderAllGanttCharts();
     }
   }
 };
@@ -416,6 +542,30 @@ export default {
 
 .chart {
   width: 100%;
-  height: 200px;
+  height: 150px;
+}
+
+.checkbox-group {
+  display: flex;
+  gap: 20px;
+  padding: 10px 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.checkbox-item input {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 </style>
