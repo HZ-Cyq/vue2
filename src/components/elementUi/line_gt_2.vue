@@ -210,24 +210,23 @@ export default {
 
       const launcherNames = Object.keys(sample.ljzd);
       const categories = [];
-      const items = [];
+      const interceptItems = [];
+      const launchItems = [];
 
       launcherNames.forEach((name, index) => {
         const launcher = sample.ljzd[name];
 
         categories.push(name);
 
-        // 第一块：拦截时间范围
-        items.push({
-          name: `${name}-拦截`,
+        interceptItems.push({
+          name: name,
           value: [index, launcher.min_intercept_time, launcher.max_intercept_time],
           itemStyle: { color: '#4ecdc4' }
         });
 
-        // 第二块：发射时间范围
-        items.push({
-          name: `${name}-发射`,
-          value: [index, launcher.min_launch_time, launcher.max_launch_time],
+        launchItems.push({
+          name: name,
+          value: [index + 0.3, launcher.min_launch_time, launcher.max_launch_time],
           itemStyle: { color: '#45b7d1' }
         });
       });
@@ -235,16 +234,21 @@ export default {
       const option = {
         tooltip: {
           formatter: params => {
-            const name = params.name.split('-')[0];
-            const type = params.name.split('-')[1];
+            const name = params.name;
+            const type = params.seriesName === '拦截时间' ? '拦截' : '发射';
             return `${name}<br/>类型: ${type}<br/>开始: ${params.value[1]}<br/>结束: ${params.value[2]}`;
           }
+        },
+        legend: {
+          data: ['拦截时间', '发射时间'],
+          right: 20,
+          bottom: 10
         },
         grid: {
           left: '120',
           right: '30',
           top: '20',
-          bottom: '40'
+          bottom: '50'
         },
         xAxis: {
           type: 'value',
@@ -264,13 +268,14 @@ export default {
         },
         series: [
           {
+            name: '拦截时间',
             type: 'custom',
+            color: '#4ecdc4',
             renderItem: (params, api) => {
               const categoryIndex = api.value(0);
               const start = api.coord([api.value(1), categoryIndex]);
               const end = api.coord([api.value(2), categoryIndex]);
               const height = 16;
-
               return {
                 type: 'rect',
                 shape: {
@@ -280,17 +285,35 @@ export default {
                   height: height
                 },
                 style: api.style(),
-                styleEmphasis: {
-                  shadowBlur: 10,
-                  shadowColor: '#333'
-                }
+                styleEmphasis: { shadowBlur: 10, shadowColor: '#333' }
               };
             },
-            encode: {
-              x: [1, 2],
-              y: 0
+            encode: { x: [1, 2], y: 0 },
+            data: interceptItems
+          },
+          {
+            name: '发射时间',
+            type: 'custom',
+            color: '#45b7d1',
+            renderItem: (params, api) => {
+              const categoryIndex = api.value(0);
+              const start = api.coord([api.value(1), categoryIndex]);
+              const end = api.coord([api.value(2), categoryIndex]);
+              const height = 16;
+              return {
+                type: 'rect',
+                shape: {
+                  x: start[0],
+                  y: start[1] - height / 2,
+                  width: end[0] - start[0],
+                  height: height
+                },
+                style: api.style(),
+                styleEmphasis: { shadowBlur: 10, shadowColor: '#333' }
+              };
             },
-            data: items
+            encode: { x: [1, 2], y: 0 },
+            data: launchItems
           }
         ]
       };
