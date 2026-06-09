@@ -134,6 +134,61 @@ export default {
     renderCharts() {
       this.renderTrajChart();
       this.renderGanttChart();
+
+      // 添加同步的缩放功能
+      const zoomOption = {
+        dataZoom: [
+          {
+            type: 'inside',
+            xAxisIndex: 0,
+            throttle: 50
+          }
+        ]
+      };
+
+      this.trajChart.setOption(zoomOption);
+      this.ganttChart.setOption(zoomOption);
+
+      // 绑定滚轮同步缩放
+      this.trajChart.getZr().on('mousewheel', params => {
+        this.syncZoom('trajChart', params.wheelDelta);
+      });
+      this.ganttChart.getZr().on('mousewheel', params => {
+        this.syncZoom('ganttChart', params.wheelDelta);
+      });
+    },
+
+    syncZoom(source, delta) {
+      const sourceChart = source === 'trajChart' ? this.trajChart : this.ganttChart;
+      const targetChart = source === 'trajChart' ? this.ganttChart : this.trajChart;
+
+      const options = sourceChart.getOption();
+      const zoom = options.dataZoom[0];
+      if (!zoom) return;
+
+      const percentWidth = targetChart.getWidth();
+      const range = zoom.end - zoom.start;
+      const deltaPercent = (delta / 500) * range;
+
+      let newStart = zoom.start - deltaPercent;
+      let newEnd = zoom.end - deltaPercent;
+
+      // 限制范围
+      if (newStart < 0) {
+        newStart = 0;
+        newEnd = range;
+      }
+      if (newEnd > 100) {
+        newEnd = 100;
+        newStart = 100 - range;
+      }
+
+      targetChart.dispatchAction({
+        type: 'dataZoom',
+        xAxisIndex: 0,
+        start: newStart,
+        end: newEnd
+      });
     },
 
     renderTrajChart() {
@@ -159,7 +214,7 @@ export default {
           }
         },
         grid: {
-          left: '60',
+          left: '100',
           right: '30',
           top: '30',
           bottom: '40'
@@ -233,10 +288,11 @@ export default {
 
       const option = {
         tooltip: {
+          trigger: 'item',
           formatter: params => {
             const name = params.name;
             const type = params.seriesName === '拦截时间' ? '拦截' : '发射';
-            return `${name}<br/>类型: ${type}<br/>开始: ${params.value[1]}<br/>结束: ${params.value[2]}`;
+            return `<b>${name}</b><br/>类型: ${type}<br/>开始: ${params.value[1]}<br/>结束: ${params.value[2]}`;
           }
         },
         legend: {
@@ -245,7 +301,7 @@ export default {
           bottom: 10
         },
         grid: {
-          left: '120',
+          left: '100',
           right: '30',
           top: '20',
           bottom: '50'
@@ -263,8 +319,16 @@ export default {
           type: 'category',
           data: categories,
           inverse: true,
-          axisLabel: { color: '#333', fontWeight: 'bold' },
-          axisLine: { lineStyle: { color: '#ccc' } }
+          axisLabel: {
+            color: '#333',
+            fontWeight: 'bold',
+            fontSize: 10
+          },
+          axisLine: { lineStyle: { color: '#ccc' } },
+          axisTooltip: {
+            trigger: 'item',
+            formatter: params => params.name
+          }
         },
         series: [
           {

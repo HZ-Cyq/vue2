@@ -18,12 +18,15 @@ import ExampleTable from './components/elementUi/ExampleTable.vue';
 import LineManager from './components/elementUi/组合/LineManager.vue';
 import PngUploader from './components/dynamicLoadPng/PngUploader.vue';
 import ShowImg from './components/dynamicLoadPng/ShowImg.vue';
+import slider from './components/input/slider.vue';
+import line_gt from './components/elementUi/line_gt.vue';
+import line_gt_2 from './components/elementUi/line_gt_2.vue';
 Vue.config.productionTip = false
 
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { ShowImg },
-  template: '<ShowImg/>'
+  components: { line_gt_2 },
+  template: '<line_gt_2/>'
 })
