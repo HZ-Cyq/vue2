@@ -26,7 +26,7 @@
 import * as echarts from 'echarts';
 
 export default {
-  name: 'MissileVisualization',
+  name: 'TrajectoryLineGt',
   data() {
     return {
       trajChart: null,
@@ -55,7 +55,7 @@ export default {
           ljzd: {
             GPI_LAUNCHER_1: {
               min_launch_time: 200,
-              max_launch_time: 300,
+              max_launch_time: 650,
               min_intercept_time: 400,
               max_intercept_time: 500,
               min_xj: 5,
@@ -76,7 +76,7 @@ export default {
           }
         },
         {
-          sampleIndex: 2,
+          sampleIndex: 3,
           sample_base_info: '',
           traj: [
             ['traj_id', 'time', 'altitude'],
@@ -289,21 +289,31 @@ export default {
         },
         xAxis: {
           type: 'value',
-          name: '时间',
+          name: '时间(s)',
           nameLocation: 'center',
           nameGap: 25,
           min: this.timeRange.min,
           max: this.timeRange.max,
-          splitLine: { lineStyle: { type: 'dashed', color: '#e0e0e0' } }
+          axisLine: { lineStyle: { color: "#aaa" } },
+          axisLabel: { color: "#fff" },
+          splitLine: {
+            show: false
+          }
         },
         yAxis: {
           type: 'value',
-          name: '高度',
+          name: '高度(m)',
           nameLocation: 'center',
           nameGap: 40,
           min: altitudeRange.min,
           max: altitudeRange.max,
-          splitLine: { lineStyle: { type: 'dashed', color: '#e0e0e0' } }
+          axisLine: { show: true, lineStyle: { color: "#aaa" } },
+          axisLabel: { color: "#fff" },
+          splitLine: {
+            lineStyle: {
+              type: 'dashed'
+            }
+          } 
         },
         dataZoom: [{
           type: 'inside',
@@ -407,14 +417,14 @@ export default {
           formatter: params => {
             const name = params.name;
             const type = params.seriesName === '拦截时间' ? '拦截' : '发射';
-            return `<b>${name}</b><br/>类型: ${type}<br/>开始: ${params.value[1]}<br/>结束: ${params.value[2]}`;
+            return `<b>${name}</b><br/>类型: ${type}<br/>最早: ${params.value[1]}s<br/>最晚: ${params.value[2]}s`;
           }
         },
         legend: {
           data: ['发射时间', '拦截时间'],
-          left: 10,
-          top: 10,
-          textStyle: { color: '#ff0000' }
+          right: 20,
+          top: 5,
+          textStyle: {color:"#fff"}
         },
         grid: {
           left: '100',
@@ -424,23 +434,35 @@ export default {
         },
         xAxis: {
           type: 'value',
-          name: '时间',
+          name: '时间(s)',
           nameLocation: 'center',
           nameGap: 25,
           min: this.timeRange.min,
           max: this.timeRange.max,
-          splitLine: { lineStyle: { type: 'dashed', color: '#e0e0e0' } }
+          axisLine: { lineStyle: { color: "#00aaff" } },
+          axisLabel: { color: "#fff" },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              type: 'dashed',
+              opacity: 0.3
+            }
+          }
         },
         yAxis: {
           type: 'category',
           data: categories,
           inverse: true,
-          axisLabel: {
-            color: '#333',
-            fontWeight: 'bold',
-            fontSize: 10
+
+          splitLine: {
+            lineStyle: {
+              type: 'dashed',
+              color: "#fff"
+            }
           },
-          axisLine: { lineStyle: { color: '#ccc' } },
+          axisLine: { show: true, lineStyle: { color: "#aaa"}},
+          axisLabel: { color: "#fff",fontSize: 10 },
+          
           axisTooltip: {
             trigger: 'item',
             formatter: params => params.name
@@ -470,7 +492,7 @@ export default {
                   height: height
                 },
                 style: api.style(),
-                styleEmphasis: { shadowBlur: 10, shadowColor: '#333' }
+                styleEmphasis: { shadowBlur: 10, shadowColor: 'white' }
               };
             },
             encode: { x: [1, 2], y: 0 },
@@ -494,7 +516,7 @@ export default {
                   height: height
                 },
                 style: api.style(),
-                styleEmphasis: { shadowBlur: 10, shadowColor: '#333' }
+                styleEmphasis: { shadowBlur: 10, shadowColor: 'white' }
               };
             },
             encode: { x: [1, 2], y: 0 },
@@ -518,25 +540,28 @@ export default {
 .missile-visualization {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0px;
   padding: 20px;
-  background: #f5f7fa;
+  /* background: #f5f7fa; */
+  color: white;
+  background-color: rgba(11, 49, 241, 0.783);
+  font-family: 微软雅黑, sans-serif;
   border-radius: 8px;
   height: 600px;
   overflow-y: auto;
 }
 
 .chart-container {
-  background: white;
+  /* background: white; */
   border-radius: 8px;
-  padding: 15px;
+  padding: 0px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .chart-title {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: white;
   margin-bottom: 10px;
   padding-left: 5px;
   border-left: 3px solid #4ecdc4;
@@ -545,13 +570,14 @@ export default {
 .chart {
   width: 100%;
   height: 150px;
+  background-color: transparent;
 }
 
 .checkbox-group {
   display: flex;
   gap: 20px;
   padding: 10px 15px;
-  background: white;
+  /* background: white; */
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -562,7 +588,7 @@ export default {
   gap: 6px;
   cursor: pointer;
   font-size: 14px;
-  color: #333;
+  color: white;
 }
 
 .checkbox-item input {
