@@ -1,35 +1,31 @@
 <template>
   <div class="missile-visualization">
+    <!-- 复选框 -->
+    <div class="checkbox-group">
+      <label
+        v-for="(item, index) in ljdetails"
+        :key="index"
+        class="checkbox-item"
+      >
+        <input type="checkbox" :value="index" v-model="selectedIndexes" />
+        样本 {{ item.sampleIndex }}（{{ item.trajectory_name }}）
+      </label>
+    </div>
+
+    <!-- 上部：进攻弹轨迹折线图 -->
     <div class="chart-container">
       <div class="chart-title">进攻弹轨迹（时间-高度）</div>
       <div ref="trajChartRef" class="chart"></div>
     </div>
 
-    <div class="checkbox-group">
-      <div
-        v-for="(item, index) in ljdetails"
-        :key="index"
-        class="checkbox-item"
-      >
-        <input
-          type="checkbox"
-          :checked="selectedIndexes.includes(index)"
-          @change="toggleIndex(index)"
-        />
-        <span>样本{{ item.sampleIndex }}（{{ item.trajectory_name }}）</span>
-      </div>
-    </div>
-
+    <!-- 下部：拦截阵地甘特图 -->
     <div
       v-for="(item, index) in visibleData"
       :key="index"
       class="chart-container"
     >
-      <div class="chart-title">拦截阵地时序 - 样本{{ item.sampleIndex }}</div>
-      <div
-        :ref="el => setGanttRef(el, index)"
-        class="chart"
-      ></div>
+      <div class="chart-title">拦截阵地时序 - 样本 {{ item.sampleIndex }}</div>
+      <div :ref="el => setGanttRef(el, index)" class="chart"></div>
     </div>
   </div>
 </template>
@@ -61,6 +57,7 @@ export default {
     }
   },
   mounted() {
+    // 初始化时全选所有数据
     if (this.ljdetails && this.ljdetails.length > 0) {
       this.selectedIndexes = this.ljdetails.map((_, index) => index);
       this.$nextTick(() => {
@@ -75,6 +72,7 @@ export default {
     this.ganttCharts.forEach(chart => chart && chart.dispose());
   },
   methods: {
+    // 初始化并渲染的完整流程
     initAndRender() {
       if (!this.trajChart) {
         this.initCharts();
@@ -84,13 +82,12 @@ export default {
         this.renderCharts();
       }
     },
-
+    
     setGanttRef(el, index) {
       if (el) {
         this.ganttRefs[index] = el;
       }
     },
-
     initCharts() {
       if (this.$refs.trajChartRef) {
         this.trajChart = echarts.init(this.$refs.trajChartRef);
@@ -98,12 +95,10 @@ export default {
       this.ganttCharts = [];
       this.ganttRefs = [];
     },
-
     handleResize() {
       if (this.trajChart) this.trajChart.resize();
       this.ganttCharts.forEach(chart => chart && chart.resize());
     },
-
     toggleIndex(index) {
       const idx = this.selectedIndexes.indexOf(index);
       if (idx > -1) {
@@ -112,7 +107,6 @@ export default {
         this.selectedIndexes.push(index);
       }
     },
-
     calculateTimeRange() {
       if (!this.ljdetails || this.ljdetails.length === 0) return;
       const sample = this.ljdetails[0];
@@ -131,7 +125,6 @@ export default {
       this.timeRange.min = 0;
       this.timeRange.max = maxTime;
     },
-
     calculateAltitudeRange() {
       if (!this.ljdetails || this.ljdetails.length === 0) return { min: 0, max: 100 };
       const sample = this.ljdetails[0];
@@ -147,17 +140,15 @@ export default {
       }
       return { min: minAlt, max: maxAlt };
     },
-
     renderCharts() {
       this.renderTrajChart();
       this.renderAllGanttCharts();
-      this.bindTrajDataZoomEvent();
+      this.bindDataZoomEvents();
       this.bindMousewheelEvents();
     },
-
-    bindTrajDataZoomEvent() {
+    bindDataZoomEvents() {
       if (!this.trajChart) return;
-      this.trajChart.off('datazoom');
+      
       this.trajChart.on('datazoom', params => {
         if (this.isSyncing) return;
         this.isSyncing = true;
@@ -171,8 +162,26 @@ export default {
         }
         this.$nextTick(() => { this.isSyncing = false; });
       });
-    },
 
+      this.ganttCharts.forEach(chart => {
+        chart.on('datazoom', params => {
+          if (this.isSyncing) return;
+          this.isSyncing = true;
+          const batch = params.batch && params.batch[0];
+          const start = batch ? batch.start : params.start;
+          const end = batch ? batch.end : params.end;
+          if (start !== undefined && end !== undefined) {
+            this.trajChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+            this.ganttCharts.forEach(otherChart => {
+              if (otherChart !== chart) {
+                otherChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+              }
+            });
+          }
+          this.$nextTick(() => { this.isSyncing = false; });
+        });
+      });
+    },
     bindMousewheelEvents() {
       this.$nextTick(() => {
         const trajDom = this.$refs.trajChartRef;
@@ -190,7 +199,6 @@ export default {
         });
       });
     },
-
     renderTrajChart() {
       if (!this.ljdetails || this.ljdetails.length === 0) return;
       const sample = this.ljdetails[0];
@@ -255,7 +263,6 @@ export default {
       };
       this.trajChart.setOption(option);
     },
-
     renderAllGanttCharts() {
       this.ganttCharts.forEach(chart => chart && chart.dispose());
       this.ganttCharts = [];
@@ -268,28 +275,9 @@ export default {
           const chart = echarts.init(dom);
           this.ganttCharts.push(chart);
           this.renderSingleGanttChart(chart, item);
-
-          // 绑定 dataZoom 事件实现同步
-          chart.on('datazoom', params => {
-            if (this.isSyncing) return;
-            this.isSyncing = true;
-            const batch = params.batch && params.batch[0];
-            const start = batch ? batch.start : params.start;
-            const end = batch ? batch.end : params.end;
-            if (start !== undefined && end !== undefined) {
-              this.trajChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
-              this.ganttCharts.forEach(otherChart => {
-                if (otherChart !== chart) {
-                  otherChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
-                }
-              });
-            }
-            this.$nextTick(() => { this.isSyncing = false; });
-          });
         });
       });
     },
-
     renderSingleGanttChart(chart, sample) {
       if (!sample || !sample.ljzd) return;
 
@@ -395,9 +383,11 @@ export default {
     }
   },
   watch: {
+    // 关键修复：异步数据传入时全选所有数据
     ljdetails: {
       handler(newVal) {
         if (newVal && newVal.length > 0) {
+          // 全选所有数据
           this.selectedIndexes = newVal.map((_, index) => index);
           this.$nextTick(() => {
             this.initAndRender();
@@ -412,7 +402,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .missile-visualization {
   display: flex;
@@ -425,11 +414,13 @@ export default {
   height: 600px;
   overflow-y: auto;
 }
+
 .chart-container {
   border-radius: 8px;
   padding: 0px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .chart-title {
   font-size: 14px;
   font-weight: 600;
@@ -438,17 +429,20 @@ export default {
   padding-left: 5px;
   border-left: 3px solid #4ecdc4;
 }
+
 .chart {
   width: 100%;
   height: 150px;
   background-color: transparent;
 }
+
 .checkbox-group {
   display: flex;
   gap: 20px;
   padding: 10px 15px;
   border-radius: 8px;
 }
+
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -457,6 +451,7 @@ export default {
   font-size: 14px;
   color: white;
 }
+
 .checkbox-item input {
   cursor: pointer;
   width: 16px;

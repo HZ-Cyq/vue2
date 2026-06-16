@@ -1,35 +1,31 @@
 <template>
   <div class="missile-visualization">
+    <!-- 复选框 -->
+    <div class="checkbox-group">
+      <label
+        v-for="(item, index) in ljdetails"
+        :key="index"
+        class="checkbox-item"
+      >
+        <input type="checkbox" :value="index" v-model="selectedIndexes" />
+        样本 {{ item.sampleIndex }}（{{ item.trajectory_name }}）
+      </label>
+    </div>
+
+    <!-- 上部：进攻弹轨迹折线图 -->
     <div class="chart-container">
       <div class="chart-title">进攻弹轨迹（时间-高度）</div>
       <div ref="trajChartRef" class="chart"></div>
     </div>
 
-    <div class="checkbox-group">
-      <div
-        v-for="(item, index) in ljdetails"
-        :key="index"
-        class="checkbox-item"
-      >
-        <input
-          type="checkbox"
-          :checked="selectedIndexes.includes(index)"
-          @change="toggleIndex(index)"
-        />
-        <span>样本{{ item.sampleIndex }}（{{ item.trajectory_name }}）</span>
-      </div>
-    </div>
-
+    <!-- 下部：拦截阵地甘特图 -->
     <div
       v-for="(item, index) in visibleData"
       :key="index"
       class="chart-container"
     >
-      <div class="chart-title">拦截阵地时序 - 样本{{ item.sampleIndex }}</div>
-      <div
-        :ref="el => setGanttRef(el, index)"
-        class="chart"
-      ></div>
+      <div class="chart-title">拦截阵地时序 - 样本 {{ item.sampleIndex }}</div>
+      <div :ref="el => setGanttRef(el, index)" class="chart"></div>
     </div>
   </div>
 </template>
@@ -39,52 +35,49 @@ import * as echarts from 'echarts';
 
 export default {
   name: 'PositionLineGt',
+
+  // ⭐ 新增 props
   props: {
     ljdetails: {
       type: Array,
       default: () => []
     }
   },
+
   data() {
     return {
       trajChart: null,
       ganttCharts: [],
       ganttRefs: [],
       timeRange: { min: 0, max: 800 },
-      selectedIndexes: [],
+      selectedIndexes: [0, 1],
       isSyncing: false
+      // ⭐ 删除原来的 ljdetails 数组
     };
   },
+
   computed: {
     visibleData() {
-      return this.selectedIndexes.map(i => this.ljdetails[i]);
+      return this.selectedIndexes.map(i => this.ljdetails[i]).filter(Boolean);
     }
   },
+
   mounted() {
+    this.initCharts();
     if (this.ljdetails && this.ljdetails.length > 0) {
-      this.selectedIndexes = this.ljdetails.map((_, index) => index);
-      this.$nextTick(() => {
-        this.initAndRender();
-      });
+      this.calculateTimeRange();
+      this.renderCharts();
     }
     window.addEventListener('resize', this.handleResize);
   },
+
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
     if (this.trajChart) this.trajChart.dispose();
     this.ganttCharts.forEach(chart => chart && chart.dispose());
   },
-  methods: {
-    initAndRender() {
-      if (!this.trajChart) {
-        this.initCharts();
-      }
-      if (this.ljdetails && this.ljdetails.length > 0) {
-        this.calculateTimeRange();
-        this.renderCharts();
-      }
-    },
 
+  methods: {
     setGanttRef(el, index) {
       if (el) {
         this.ganttRefs[index] = el;
@@ -92,9 +85,7 @@ export default {
     },
 
     initCharts() {
-      if (this.$refs.trajChartRef) {
-        this.trajChart = echarts.init(this.$refs.trajChartRef);
-      }
+      this.trajChart = echarts.init(this.$refs.trajChartRef);
       this.ganttCharts = [];
       this.ganttRefs = [];
     },
@@ -104,17 +95,7 @@ export default {
       this.ganttCharts.forEach(chart => chart && chart.resize());
     },
 
-    toggleIndex(index) {
-      const idx = this.selectedIndexes.indexOf(index);
-      if (idx > -1) {
-        this.selectedIndexes.splice(idx, 1);
-      } else {
-        this.selectedIndexes.push(index);
-      }
-    },
-
     calculateTimeRange() {
-      if (!this.ljdetails || this.ljdetails.length === 0) return;
       const sample = this.ljdetails[0];
       if (!sample) return;
       let minTime = Infinity;
@@ -133,7 +114,6 @@ export default {
     },
 
     calculateAltitudeRange() {
-      if (!this.ljdetails || this.ljdetails.length === 0) return { min: 0, max: 100 };
       const sample = this.ljdetails[0];
       if (!sample || !sample.traj) return { min: 0, max: 100 };
       let minAlt = Infinity;
@@ -151,13 +131,7 @@ export default {
     renderCharts() {
       this.renderTrajChart();
       this.renderAllGanttCharts();
-      this.bindTrajDataZoomEvent();
-      this.bindMousewheelEvents();
-    },
 
-    bindTrajDataZoomEvent() {
-      if (!this.trajChart) return;
-      this.trajChart.off('datazoom');
       this.trajChart.on('datazoom', params => {
         if (this.isSyncing) return;
         this.isSyncing = true;
@@ -171,9 +145,26 @@ export default {
         }
         this.$nextTick(() => { this.isSyncing = false; });
       });
-    },
 
-    bindMousewheelEvents() {
+      this.ganttCharts.forEach(chart => {
+        chart.on('datazoom', params => {
+          if (this.isSyncing) return;
+          this.isSyncing = true;
+          const batch = params.batch && params.batch[0];
+          const start = batch ? batch.start : params.start;
+          const end = batch ? batch.end : params.end;
+          if (start !== undefined && end !== undefined) {
+            this.trajChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+            this.ganttCharts.forEach(otherChart => {
+              if (otherChart !== chart) {
+                otherChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+              }
+            });
+          }
+          this.$nextTick(() => { this.isSyncing = false; });
+        });
+      });
+
       this.$nextTick(() => {
         const trajDom = this.$refs.trajChartRef;
         if (trajDom) {
@@ -192,20 +183,16 @@ export default {
     },
 
     renderTrajChart() {
-      if (!this.ljdetails || this.ljdetails.length === 0) return;
       const sample = this.ljdetails[0];
-      if (!sample || !sample.traj || !this.trajChart) return;
-
+      if (!sample || !sample.traj) return;
       const times = [];
       const altitudes = [];
       const altitudeRange = this.calculateAltitudeRange();
-
       for (let i = 1; i < sample.traj.length; i++) {
         const row = sample.traj[i];
         times.push(parseFloat(row[1]));
         altitudes.push(parseFloat(row[2]));
       }
-
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -238,20 +225,22 @@ export default {
           splitLine: { lineStyle: { type: 'dashed' } }
         },
         dataZoom: [{ type: 'inside', xAxisIndex: 0, throttle: 50 }],
-        series: [{
-          type: 'line',
-          data: times.map((t, i) => [t, altitudes[i]]),
-          smooth: true,
-          symbol: 'none',
-          lineStyle: { color: '#ff6b6b', width: 3 },
-          itemStyle: { color: '#ff6b6b' },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(255,107,107,0.3)' },
-              { offset: 1, color: 'rgba(255,107,107,0.05)' }
-            ])
+        series: [
+          {
+            type: 'line',
+            data: times.map((t, i) => [t, altitudes[i]]),
+            smooth: true,
+            symbol: 'none',
+            lineStyle: { color: '#ff6b6b', width: 3 },
+            itemStyle: { color: '#ff6b6b' },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(255,107,107,0.3)' },
+                { offset: 1, color: 'rgba(255,107,107,0.05)' }
+              ])
+            }
           }
-        }]
+        ]
       };
       this.trajChart.setOption(option);
     },
@@ -259,17 +248,13 @@ export default {
     renderAllGanttCharts() {
       this.ganttCharts.forEach(chart => chart && chart.dispose());
       this.ganttCharts = [];
-
       this.$nextTick(() => {
         this.visibleData.forEach((item, index) => {
           const dom = this.ganttRefs[index];
           if (!dom) return;
-
           const chart = echarts.init(dom);
           this.ganttCharts.push(chart);
           this.renderSingleGanttChart(chart, item);
-
-          // 绑定 dataZoom 事件实现同步
           chart.on('datazoom', params => {
             if (this.isSyncing) return;
             this.isSyncing = true;
@@ -292,12 +277,10 @@ export default {
 
     renderSingleGanttChart(chart, sample) {
       if (!sample || !sample.ljzd) return;
-
       const launcherNames = Object.keys(sample.ljzd);
       const categories = [];
       const interceptItems = [];
       const launchItems = [];
-
       launcherNames.forEach((name, index) => {
         const launcher = sample.ljzd[name];
         categories.push(name);
@@ -312,7 +295,6 @@ export default {
           itemStyle: { color: '#45b7d1' }
         });
       });
-
       const option = {
         tooltip: {
           trigger: 'item',
@@ -322,12 +304,7 @@ export default {
             return `<b>${name}</b><br/>类型: ${type}<br/>最早: ${params.value[1]}s<br/>最晚: ${params.value[2]}s`;
           }
         },
-        legend: {
-          data: ['发射时间', '拦截时间'],
-          right: 20,
-          top: 5,
-          textStyle: { color: "#fff" }
-        },
+        legend: { data: ['发射时间', '拦截时间'], right: 20, top: 5, textStyle: { color: "#fff" } },
         grid: { left: '100', right: '30', top: '20', bottom: '50' },
         xAxis: {
           type: 'value',
@@ -394,18 +371,8 @@ export default {
       chart.setOption(option);
     }
   },
+
   watch: {
-    ljdetails: {
-      handler(newVal) {
-        if (newVal && newVal.length > 0) {
-          this.selectedIndexes = newVal.map((_, index) => index);
-          this.$nextTick(() => {
-            this.initAndRender();
-          });
-        }
-      },
-      immediate: false
-    },
     selectedIndexes() {
       this.renderAllGanttCharts();
     }
@@ -425,11 +392,13 @@ export default {
   height: 600px;
   overflow-y: auto;
 }
+
 .chart-container {
   border-radius: 8px;
   padding: 0px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .chart-title {
   font-size: 14px;
   font-weight: 600;
@@ -438,17 +407,20 @@ export default {
   padding-left: 5px;
   border-left: 3px solid #4ecdc4;
 }
+
 .chart {
   width: 100%;
   height: 150px;
   background-color: transparent;
 }
+
 .checkbox-group {
   display: flex;
   gap: 20px;
   padding: 10px 15px;
   border-radius: 8px;
 }
+
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -457,6 +429,7 @@ export default {
   font-size: 14px;
   color: white;
 }
+
 .checkbox-item input {
   cursor: pointer;
   width: 16px;

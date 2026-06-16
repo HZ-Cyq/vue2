@@ -1,23 +1,24 @@
 <template>
   <div class="missile-visualization">
+    <!-- 下拉框 -->
+    <div class="select-group">
+      <select v-model="selectedIndex">
+        <option v-for="(item, index) in data" :key="index" :value="index">
+          样本 {{ item.sampleIndex }}（{{ item.trajectory_name }}）
+        </option>
+      </select>
+    </div>
+
     <!-- 上部：进攻弹轨迹折线图 -->
     <div class="chart-container">
       <div class="chart-title">进攻弹轨迹（时间-高度）</div>
       <div ref="trajChartRef" class="chart"></div>
     </div>
 
-    <!-- 多选框 -->
-    <div class="checkbox-group">
-      <label v-for="(item, index) in data" :key="index" class="checkbox-item">
-        <input type="checkbox" v-model="selectedIndexes" :value="index" />
-        <span>样本 {{ item.sampleIndex }}</span>
-      </label>
-    </div>
-
     <!-- 下部：拦截阵地甘特图 -->
-    <div class="chart-container" v-for="(item, index) in visibleData" :key="index">
-      <div class="chart-title">拦截阵地时序 - 样本 {{ item.sampleIndex }}</div>
-      <div :ref="el => setGanttRef(el, index)" class="chart"></div>
+    <div class="chart-container">
+      <div class="chart-title">拦截阵地时序</div>
+      <div ref="ganttChartRef" class="chart"></div>
     </div>
   </div>
 </template>
@@ -30,17 +31,17 @@ export default {
   data() {
     return {
       trajChart: null,
-      ganttCharts: [],
-      ganttRefs: [],
+      ganttChart: null,
       timeRange: { min: 0, max: 800 },
-      selectedIndexes: [0, 1],
       isSyncing: false,
+      selectedIndex: 0,
 
       // 数据
       data: [
         {
           sampleIndex: 1,
           sample_base_info: '',
+          trajectory_name:"弹道aa",
           traj: [
             ['traj_id', 'time', 'altitude'],
             ['TSPI_MISSILE_10001', 1.0, 5.0],
@@ -78,16 +79,17 @@ export default {
         {
           sampleIndex: 3,
           sample_base_info: '',
+          trajectory_name:"弹道bb",
           traj: [
             ['traj_id', 'time', 'altitude'],
-            ['TSPI_MISSILE_10001', 1.0, 5.0],
-            ['TSPI_MISSILE_10001', 100.0, 10.0],
-            ['TSPI_MISSILE_10001', 200.0, 15.0],
-            ['TSPI_MISSILE_10001', 300.0, 20.0],
-            ['TSPI_MISSILE_10001', 400.0, 18.0],
-            ['TSPI_MISSILE_10001', 500.0, 25.0],
-            ['TSPI_MISSILE_10001', 600.0, 30.0],
-            ['TSPI_MISSILE_10001', 700.0, 6.0]
+            ['TSPI_MISSILE_10002', 1.0, 5.0],
+            ['TSPI_MISSILE_10002', 100.0, 10.0],
+            ['TSPI_MISSILE_10002', 200.0, 15.0],
+            ['TSPI_MISSILE_10002', 300.0, 20.0],
+            ['TSPI_MISSILE_10002', 400.0, 18.0],
+            ['TSPI_MISSILE_10002', 500.0, 25.0],
+            ['TSPI_MISSILE_10002', 600.0, 30.0],
+            ['TSPI_MISSILE_10002', 800.0, 6.0]
           ],
           ljzd: {
             GPI_LAUNCHER_1: {
@@ -115,42 +117,46 @@ export default {
       ]
     };
   },
+
   computed: {
-    visibleData() {
-      return this.selectedIndexes.map(i => this.data[i]);
+    currentData() {
+      return this.data[this.selectedIndex] || this.data[0];
     }
   },
+
+  watch: {
+    selectedIndex() {
+      this.calculateTimeRange();
+      this.renderCharts();
+    }
+  },
+
   mounted() {
     this.calculateTimeRange();
     this.initCharts();
     this.renderCharts();
     window.addEventListener('resize', this.handleResize);
   },
+
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
     if (this.trajChart) this.trajChart.dispose();
-    this.ganttCharts.forEach(chart => chart && chart.dispose());
+    if (this.ganttChart) this.ganttChart.dispose();
   },
-  methods: {
-    setGanttRef(el, index) {
-      if (el) {
-        this.ganttRefs[index] = el;
-      }
-    },
 
+  methods: {
     initCharts() {
       this.trajChart = echarts.init(this.$refs.trajChartRef);
-      this.ganttCharts = [];
-      this.ganttRefs = [];
+      this.ganttChart = echarts.init(this.$refs.ganttChartRef);
     },
 
     handleResize() {
       if (this.trajChart) this.trajChart.resize();
-      this.ganttCharts.forEach(chart => chart && chart.resize());
+      if (this.ganttChart) this.ganttChart.resize();
     },
 
     calculateTimeRange() {
-      const sample = this.data[0];
+      const sample = this.currentData;
       if (!sample) return;
 
       let minTime = Infinity;
@@ -171,7 +177,7 @@ export default {
     },
 
     calculateAltitudeRange() {
-      const sample = this.data[0];
+      const sample = this.currentData;
       if (!sample || !sample.traj) return { min: 0, max: 100 };
 
       let minAlt = Infinity;
@@ -190,7 +196,7 @@ export default {
 
     renderCharts() {
       this.renderTrajChart();
-      this.renderAllGanttCharts();
+      this.renderGanttChart();
 
       // 监听ECharts内置的dataZoom事件实现同步
       this.trajChart.on('datazoom', params => {
@@ -200,67 +206,52 @@ export default {
         const start = batch ? batch.start : params.start;
         const end = batch ? batch.end : params.end;
         if (start !== undefined && end !== undefined) {
-          this.ganttCharts.forEach(chart => {
-            chart.dispatchAction({
-              type: 'dataZoom',
-              dataZoomIndex: 0,
-              start: start,
-              end: end
-            });
+          this.ganttChart.dispatchAction({
+            type: 'dataZoom',
+            dataZoomIndex: 0,
+            start: start,
+            end: end
           });
         }
         this.$nextTick(() => { this.isSyncing = false; });
       });
 
-      this.ganttCharts.forEach(chart => {
-        chart.on('datazoom', params => {
-          if (this.isSyncing) return;
-          this.isSyncing = true;
-          const batch = params.batch && params.batch[0];
-          const start = batch ? batch.start : params.start;
-          const end = batch ? batch.end : params.end;
-          if (start !== undefined && end !== undefined) {
-            this.trajChart.dispatchAction({
-              type: 'dataZoom',
-              dataZoomIndex: 0,
-              start: start,
-              end: end
-            });
-            this.ganttCharts.forEach(otherChart => {
-              if (otherChart !== chart) {
-                otherChart.dispatchAction({
-                  type: 'dataZoom',
-                  dataZoomIndex: 0,
-                  start: start,
-                  end: end
-                });
-              }
-            });
-          }
-          this.$nextTick(() => { this.isSyncing = false; });
-        });
+      this.ganttChart.on('datazoom', params => {
+        if (this.isSyncing) return;
+        this.isSyncing = true;
+        const batch = params.batch && params.batch[0];
+        const start = batch ? batch.start : params.start;
+        const end = batch ? batch.end : params.end;
+        if (start !== undefined && end !== undefined) {
+          this.trajChart.dispatchAction({
+            type: 'dataZoom',
+            dataZoomIndex: 0,
+            start: start,
+            end: end
+          });
+        }
+        this.$nextTick(() => { this.isSyncing = false; });
       });
 
       // 阻止原生滚轮事件冒泡
       this.$nextTick(() => {
         const trajDom = this.$refs.trajChartRef;
+        const ganttDom = this.$refs.ganttChartRef;
         if (trajDom) {
           trajDom.addEventListener('mousewheel', e => {
             e.stopPropagation();
           });
         }
-        this.ganttRefs.forEach(dom => {
-          if (dom) {
-            dom.addEventListener('mousewheel', e => {
-              e.stopPropagation();
-            });
-          }
-        });
+        if (ganttDom) {
+          ganttDom.addEventListener('mousewheel', e => {
+            e.stopPropagation();
+          });
+        }
       });
     },
 
     renderTrajChart() {
-      const sample = this.data[0];
+      const sample = this.currentData;
       if (!sample || !sample.traj) return;
 
       const times = [];
@@ -296,9 +287,7 @@ export default {
           max: this.timeRange.max,
           axisLine: { lineStyle: { color: "#aaa" } },
           axisLabel: { color: "#fff" },
-          splitLine: {
-            show: false
-          }
+          splitLine: { show: false }
         },
         yAxis: {
           type: 'value',
@@ -309,11 +298,7 @@ export default {
           max: altitudeRange.max,
           axisLine: { show: true, lineStyle: { color: "#aaa" } },
           axisLabel: { color: "#fff" },
-          splitLine: {
-            lineStyle: {
-              type: 'dashed'
-            }
-          } 
+          splitLine: { lineStyle: { type: 'dashed' } }
         },
         dataZoom: [{
           type: 'inside',
@@ -341,51 +326,8 @@ export default {
       this.trajChart.setOption(option);
     },
 
-    renderAllGanttCharts() {
-      this.ganttCharts.forEach(chart => chart && chart.dispose());
-      this.ganttCharts = [];
-
-      this.$nextTick(() => {
-        this.visibleData.forEach((item, index) => {
-          const dom = this.ganttRefs[index];
-          if (!dom) return;
-
-          const chart = echarts.init(dom);
-          this.ganttCharts.push(chart);
-          this.renderSingleGanttChart(chart, item);
-
-          // 绑定dataZoom同步事件
-          chart.on('datazoom', params => {
-            if (this.isSyncing) return;
-            this.isSyncing = true;
-            const batch = params.batch && params.batch[0];
-            const start = batch ? batch.start : params.start;
-            const end = batch ? batch.end : params.end;
-            if (start !== undefined && end !== undefined) {
-              this.trajChart.dispatchAction({
-                type: 'dataZoom',
-                dataZoomIndex: 0,
-                start: start,
-                end: end
-              });
-              this.ganttCharts.forEach(otherChart => {
-                if (otherChart !== chart) {
-                  otherChart.dispatchAction({
-                    type: 'dataZoom',
-                    dataZoomIndex: 0,
-                    start: start,
-                    end: end
-                  });
-                }
-              });
-            }
-            this.$nextTick(() => { this.isSyncing = false; });
-          });
-        });
-      });
-    },
-
-    renderSingleGanttChart(chart, sample) {
+    renderGanttChart() {
+      const sample = this.currentData;
       if (!sample || !sample.ljzd) return;
 
       const launcherNames = Object.keys(sample.ljzd);
@@ -395,15 +337,12 @@ export default {
 
       launcherNames.forEach((name, index) => {
         const launcher = sample.ljzd[name];
-
         categories.push(name);
-
         interceptItems.push({
           name: name,
           value: [index, launcher.min_intercept_time, launcher.max_intercept_time],
           itemStyle: { color: '#4ecdc4' }
         });
-
         launchItems.push({
           name: name,
           value: [index + 0.3, launcher.min_launch_time, launcher.max_launch_time],
@@ -424,7 +363,7 @@ export default {
           data: ['发射时间', '拦截时间'],
           right: 20,
           top: 5,
-          textStyle: {color:"#fff"}
+          textStyle: { color: "#fff" }
         },
         grid: {
           left: '100',
@@ -441,28 +380,15 @@ export default {
           max: this.timeRange.max,
           axisLine: { lineStyle: { color: "#00aaff" } },
           axisLabel: { color: "#fff" },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              type: 'dashed',
-              opacity: 0.3
-            }
-          }
+          splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
         },
         yAxis: {
           type: 'category',
           data: categories,
           inverse: true,
-
-          splitLine: {
-            lineStyle: {
-              type: 'dashed',
-              color: "#fff"
-            }
-          },
-          axisLine: { show: true, lineStyle: { color: "#aaa"}},
-          axisLabel: { color: "#fff",fontSize: 10 },
-          
+          splitLine: { lineStyle: { type: 'dashed', color: "#fff" } },
+          axisLine: { show: true, lineStyle: { color: "#aaa" } },
+          axisLabel: { color: "#fff", fontSize: 10 },
           axisTooltip: {
             trigger: 'item',
             formatter: params => params.name
@@ -525,12 +451,7 @@ export default {
         ]
       };
 
-      chart.setOption(option);
-    }
-  },
-  watch: {
-    selectedIndexes() {
-      this.renderAllGanttCharts();
+      this.ganttChart.setOption(option);
     }
   }
 };
@@ -542,7 +463,6 @@ export default {
   flex-direction: column;
   gap: 0px;
   padding: 20px;
-  /* background: #f5f7fa; */
   color: white;
   background-color: rgba(11, 49, 241, 0.783);
   font-family: 微软雅黑, sans-serif;
@@ -552,7 +472,6 @@ export default {
 }
 
 .chart-container {
-  /* background: white; */
   border-radius: 8px;
   padding: 0px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -573,27 +492,23 @@ export default {
   background-color: transparent;
 }
 
-.checkbox-group {
-  display: flex;
-  gap: 20px;
-  padding: 10px 15px;
-  /* background: white; */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.select-group {
+  padding: 10px 0;
 }
 
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 14px;
+.select-group select {
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: 微软雅黑, sans-serif;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.checkbox-item input {
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
+.select-group select option {
+  background-color: rgba(11, 49, 241, 0.9);
+  color: white;
 }
 </style>

@@ -21,13 +21,16 @@ import ShowImg from './components/dynamicLoadPng/ShowImg.vue';
 import slider from './components/input/slider.vue';
 import line_gt from './components/elementUi/line_gt.vue';
 import line_gt_2 from './components/elementUi/line_gt_2.vue';
-import TrajectoryLineGt from './components/elementUi/TrajectoryLineGt.vue';
+// import ParentView from './components/elementUi/01/ParentView.vue';
+// import TrajectoryLineGt from './components/elementUi/01/TrajectoryLineGt.vue';
+import ParentView from './components/elementUi/01/ParentView.vue';
+
 Vue.config.productionTip = false
 
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { TrajectoryLineGt },
-  template: '<TrajectoryLineGt/>'
+  components: { ParentView },
+  template: '<ParentView/>'
 })
