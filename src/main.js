@@ -23,7 +23,12 @@ import line_gt from './components/elementUi/line_gt.vue';
 import line_gt_2 from './components/elementUi/line_gt_2.vue';
 // import ParentView from './components/elementUi/01/ParentView.vue';
 // import TrajectoryLineGt from './components/elementUi/01/TrajectoryLineGt.vue';
+// 甘特图和折线图组合
 import ParentView from './components/elementUi/01/ParentView.vue';
+// 柱状图
+import BarChart from './components/elementUi/01/BarChart.vue';
+// 两个div，默认显示第一个div，点击按钮后，将第二个div覆盖住第一个div
+import TwoDiv from './components/elementUi/01/TwoDiv.vue';
 
 Vue.config.productionTip = false
 
@@ -31,6 +36,6 @@ Vue.config.productionTip = false
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { ParentView },
-  template: '<ParentView/>'
+  components: { BarChart },
+  template: '<BarChart/>'
 })

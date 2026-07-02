@@ -35,10 +35,10 @@
             ],
             ljzd: {
               GPI_LAUNCHER_1: {
-                min_launch_time: 200,
-                max_launch_time: 650,
-                min_intercept_time: 400,
-                max_intercept_time: 500,
+                min_launch_time: 100,
+                max_launch_time: 300,
+                min_intercept_time: 200,
+                max_intercept_time: 650,
                 min_xj: 5,
                 max_xj: 6,
                 min_intercept_height: 7,

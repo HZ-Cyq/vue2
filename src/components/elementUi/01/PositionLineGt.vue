@@ -1,35 +1,22 @@
 <template>
   <div class="missile-visualization">
     <div class="chart-container">
-      <div class="chart-title">进攻弹轨迹（时间-高度）</div>
+      <div class="chart-title">
+        进攻弹轨迹（时间-高度） 样本{{ firstItem.sampleIndex }}（{{ firstItem.trajectory_name }}） 拦截阵地时序 - 样本{{ firstItem.sampleIndex }}
+      </div>
       <div ref="trajChartRef" class="chart"></div>
     </div>
 
     <div class="checkbox-group">
-      <div
-        v-for="(item, index) in ljdetails"
-        :key="index"
-        class="checkbox-item"
-      >
-        <input
-          type="checkbox"
-          :checked="selectedIndexes.includes(index)"
-          @change="toggleIndex(index)"
-        />
-        <span>样本{{ item.sampleIndex }}（{{ item.trajectory_name }}）</span>
-      </div>
+      <label v-for="(item, index) in ljdetails" :key="index" class="checkbox-item">
+        <input type="checkbox" :checked="selectedIndexes.includes(index)" @change="toggleIndex(index)" />
+        {{ item.sampleIndex }} - {{ item.trajectory_name }}
+      </label>
     </div>
 
-    <div
-      v-for="(item, index) in visibleData"
-      :key="index"
-      class="chart-container"
-    >
-      <div class="chart-title">拦截阵地时序 - 样本{{ item.sampleIndex }}</div>
-      <div
-        :ref="el => setGanttRef(el, index)"
-        class="chart"
-      ></div>
+    <div v-for="(item, index) in visibleData" :key="index" class="chart-container">
+      <div class="chart-title">阵地 {{ item.sampleIndex }} - {{ item.trajectory_name }}</div>
+      <div :ref="el => setGanttRef(el, index)" class="chart"></div>
     </div>
   </div>
 </template>
@@ -56,6 +43,9 @@ export default {
     };
   },
   computed: {
+    firstItem() {
+      return this.ljdetails && this.ljdetails.length > 0 ? this.ljdetails[0] : {};
+    },
     visibleData() {
       return this.selectedIndexes.map(i => this.ljdetails[i]);
     }
@@ -166,10 +156,17 @@ export default {
         const end = batch ? batch.end : params.end;
         if (start !== undefined && end !== undefined) {
           this.ganttCharts.forEach(chart => {
-            chart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+            chart.dispatchAction({
+              type: 'dataZoom',
+              dataZoomIndex: 0,
+              start: start,
+              end: end
+            });
           });
         }
-        this.$nextTick(() => { this.isSyncing = false; });
+        this.$nextTick(() => {
+          this.isSyncing = false;
+        });
       });
     },
 
@@ -195,17 +192,14 @@ export default {
       if (!this.ljdetails || this.ljdetails.length === 0) return;
       const sample = this.ljdetails[0];
       if (!sample || !sample.traj || !this.trajChart) return;
-
       const times = [];
       const altitudes = [];
       const altitudeRange = this.calculateAltitudeRange();
-
       for (let i = 1; i < sample.traj.length; i++) {
         const row = sample.traj[i];
         times.push(parseFloat(row[1]));
         altitudes.push(parseFloat(row[2]));
       }
-
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -214,7 +208,12 @@ export default {
             return `时间: ${p.value[0]}<br/>高度: ${p.value[1]}`;
           }
         },
-        grid: { left: '100', right: '30', top: '30', bottom: '40' },
+        grid: {
+          left: '100',
+          right: '30',
+          top: '30',
+          bottom: '40'
+        },
         xAxis: {
           type: 'value',
           name: '时间(s)',
@@ -222,9 +221,15 @@ export default {
           nameGap: 25,
           min: this.timeRange.min,
           max: this.timeRange.max,
-          axisLine: { lineStyle: { color: "#aaa" } },
-          axisLabel: { color: "#fff" },
-          splitLine: { show: false }
+          axisLine: {
+            lineStyle: { color: "#aaa" }
+          },
+          axisLabel: {
+            color: "#fff"
+          },
+          splitLine: {
+            show: false
+          }
         },
         yAxis: {
           type: 'value',
@@ -233,23 +238,42 @@ export default {
           nameGap: 40,
           min: altitudeRange.min,
           max: altitudeRange.max,
-          axisLine: { show: true, lineStyle: { color: "#aaa" } },
-          axisLabel: { color: "#fff" },
-          splitLine: { lineStyle: { type: 'dashed' } }
+          axisLine: {
+            show: true,
+            lineStyle: { color: "#aaa" }
+          },
+          axisLabel: {
+            color: "#fff"
+          },
+          splitLine: {
+            lineStyle: { type: 'dashed' }
+          }
         },
-        dataZoom: [{ type: 'inside', xAxisIndex: 0, throttle: 50 }],
+        dataZoom: [{
+          type: 'inside',
+          xAxisIndex: 0,
+          throttle: 50
+        }],
         series: [{
           type: 'line',
           data: times.map((t, i) => [t, altitudes[i]]),
           smooth: true,
           symbol: 'none',
-          lineStyle: { color: '#ff6b6b', width: 3 },
-          itemStyle: { color: '#ff6b6b' },
+          lineStyle: {
+            color: '#ff6b6b',
+            width: 3
+          },
+          itemStyle: {
+            color: '#ff6b6b'
+          },
           areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(255,107,107,0.3)' },
-              { offset: 1, color: 'rgba(255,107,107,0.05)' }
-            ])
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(255,107,107,0.3)'
+            }, {
+              offset: 1,
+              color: 'rgba(255,107,107,0.05)'
+            }])
           }
         }]
       };
@@ -259,17 +283,14 @@ export default {
     renderAllGanttCharts() {
       this.ganttCharts.forEach(chart => chart && chart.dispose());
       this.ganttCharts = [];
-
       this.$nextTick(() => {
         this.visibleData.forEach((item, index) => {
           const dom = this.ganttRefs[index];
           if (!dom) return;
-
           const chart = echarts.init(dom);
           this.ganttCharts.push(chart);
           this.renderSingleGanttChart(chart, item);
 
-          // 绑定 dataZoom 事件实现同步
           chart.on('datazoom', params => {
             if (this.isSyncing) return;
             this.isSyncing = true;
@@ -277,14 +298,26 @@ export default {
             const start = batch ? batch.start : params.start;
             const end = batch ? batch.end : params.end;
             if (start !== undefined && end !== undefined) {
-              this.trajChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+              this.trajChart.dispatchAction({
+                type: 'dataZoom',
+                dataZoomIndex: 0,
+                start: start,
+                end: end
+              });
               this.ganttCharts.forEach(otherChart => {
                 if (otherChart !== chart) {
-                  otherChart.dispatchAction({ type: 'dataZoom', dataZoomIndex: 0, start: start, end: end });
+                  otherChart.dispatchAction({
+                    type: 'dataZoom',
+                    dataZoomIndex: 0,
+                    start: start,
+                    end: end
+                  });
                 }
               });
             }
-            this.$nextTick(() => { this.isSyncing = false; });
+            this.$nextTick(() => {
+              this.isSyncing = false;
+            });
           });
         });
       });
@@ -292,7 +325,6 @@ export default {
 
     renderSingleGanttChart(chart, sample) {
       if (!sample || !sample.ljzd) return;
-
       const launcherNames = Object.keys(sample.ljzd);
       const categories = [];
       const interceptItems = [];
@@ -301,19 +333,22 @@ export default {
       launcherNames.forEach((name, index) => {
         const launcher = sample.ljzd[name];
         categories.push(name);
+
         interceptItems.push({
           name: name,
           value: [index, launcher.min_intercept_time, launcher.max_intercept_time],
-          itemStyle: { color: '#4ecdc4' }
+          itemStyle: { color: 'rgba(230, 126, 34, 0.5)' }
         });
+
         launchItems.push({
           name: name,
           value: [index + 0.3, launcher.min_launch_time, launcher.max_launch_time],
-          itemStyle: { color: '#45b7d1' }
+          itemStyle: { color: 'rgba(46, 204, 113, 0.5)' }
         });
       });
 
       const option = {
+        color: ['rgba(46, 204, 113, 0.5)', 'rgba(230, 126, 34, 0.5)'],
         tooltip: {
           trigger: 'item',
           formatter: params => {
@@ -326,9 +361,16 @@ export default {
           data: ['发射时间', '拦截时间'],
           right: 20,
           top: 5,
-          textStyle: { color: "#fff" }
+          textStyle: { color: "#fff" },
+          itemWidth: 20,
+          itemHeight: 10
         },
-        grid: { left: '100', right: '30', top: '20', bottom: '50' },
+        grid: {
+          left: '100',
+          right: '30',
+          top: '20',
+          bottom: '50'
+        },
         xAxis: {
           type: 'value',
           name: '时间(s)',
@@ -336,60 +378,101 @@ export default {
           nameGap: 25,
           min: this.timeRange.min,
           max: this.timeRange.max,
-          axisLine: { lineStyle: { color: "#00aaff" } },
-          axisLabel: { color: "#fff" },
-          splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
+          axisLine: {
+            lineStyle: { color: "#00aaff" }
+          },
+          axisLabel: {
+            color: "#fff"
+          },
+          splitLine: {
+            show: true,
+            lineStyle: { type: 'dashed', opacity: 0.3 }
+          }
         },
         yAxis: {
           type: 'category',
           data: categories,
           inverse: true,
-          splitLine: { lineStyle: { type: 'dashed', color: "#fff" } },
-          axisLine: { show: true, lineStyle: { color: "#aaa" } },
-          axisLabel: { color: "#fff", fontSize: 10 },
-          axisTooltip: { trigger: 'item', formatter: params => params.name }
-        },
-        dataZoom: [{ type: 'inside', xAxisIndex: 0, throttle: 50 }],
-        series: [
-          {
-            name: '拦截时间',
-            type: 'custom',
-            color: '#4ecdc4',
-            renderItem: (params, api) => {
-              const categoryIndex = api.value(0);
-              const start = api.coord([api.value(1), categoryIndex]);
-              const end = api.coord([api.value(2), categoryIndex]);
-              const height = 16;
-              return {
-                type: 'rect',
-                shape: { x: start[0], y: start[1] - height / 2, width: end[0] - start[0], height: height },
-                style: api.style(),
-                styleEmphasis: { shadowBlur: 10, shadowColor: 'white' }
-              };
-            },
-            encode: { x: [1, 2], y: 0 },
-            data: interceptItems
+          splitLine: {
+            lineStyle: { type: 'dashed', color: "#fff" }
           },
-          {
-            name: '发射时间',
-            type: 'custom',
-            color: '#45b7d1',
-            renderItem: (params, api) => {
-              const categoryIndex = api.value(0);
-              const start = api.coord([api.value(1), categoryIndex]);
-              const end = api.coord([api.value(2), categoryIndex]);
-              const height = 16;
-              return {
-                type: 'rect',
-                shape: { x: start[0], y: start[1] - height / 2, width: end[0] - start[0], height: height },
-                style: api.style(),
-                styleEmphasis: { shadowBlur: 10, shadowColor: 'white' }
-              };
-            },
-            encode: { x: [1, 2], y: 0 },
-            data: launchItems
+          axisLine: {
+            show: true,
+            lineStyle: { color: "#aaa" }
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 10
+          },
+          axisTooltip: {
+            trigger: 'item',
+            formatter: params => params.name
           }
-        ]
+        },
+        dataZoom: [{
+          type: 'inside',
+          xAxisIndex: 0,
+          throttle: 50
+        }],
+        series: [{
+          name: '发射时间',
+          type: 'custom',
+          color: 'rgba(46, 204, 113, 0.5)',
+          renderItem: (params, api) => {
+            const categoryIndex = api.value(0);
+            const start = api.coord([api.value(1), categoryIndex]);
+            const end = api.coord([api.value(2), categoryIndex]);
+            const height = 16;
+            return {
+              type: 'rect',
+              shape: {
+                x: start[0],
+                y: start[1] - height / 2,
+                width: end[0] - start[0],
+                height: height
+              },
+              style: api.style(),
+              styleEmphasis: {
+                shadowBlur: 10,
+                shadowColor: 'white'
+              }
+            };
+          },
+          encode: {
+            x: [1, 2],
+            y: 0
+          },
+          data: launchItems
+        }, {
+          name: '拦截时间',
+          type: 'custom',
+          color: 'rgba(230, 126, 34, 0.5)',
+          renderItem: (params, api) => {
+            const categoryIndex = api.value(0);
+            const start = api.coord([api.value(1), categoryIndex]);
+            const end = api.coord([api.value(2), categoryIndex]);
+            const height = 16;
+            return {
+              type: 'rect',
+              shape: {
+                x: start[0],
+                y: start[1] - height / 2,
+                width: end[0] - start[0],
+                height: height
+              },
+              style: api.style(),
+              styleEmphasis: {
+                shadowBlur: 10,
+                shadowColor: 'white'
+              }
+            };
+          },
+          encode: {
+            x: [1, 2],
+            y: 0
+          },
+          data: interceptItems
+        }]
       };
       chart.setOption(option);
     }
@@ -425,11 +508,13 @@ export default {
   height: 600px;
   overflow-y: auto;
 }
+
 .chart-container {
   border-radius: 8px;
   padding: 0px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .chart-title {
   font-size: 14px;
   font-weight: 600;
@@ -438,17 +523,20 @@ export default {
   padding-left: 5px;
   border-left: 3px solid #4ecdc4;
 }
+
 .chart {
   width: 100%;
   height: 150px;
   background-color: transparent;
 }
+
 .checkbox-group {
   display: flex;
   gap: 20px;
   padding: 10px 15px;
   border-radius: 8px;
 }
+
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -457,6 +545,7 @@ export default {
   font-size: 14px;
   color: white;
 }
+
 .checkbox-item input {
   cursor: pointer;
   width: 16px;
