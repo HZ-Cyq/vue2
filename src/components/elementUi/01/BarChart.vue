@@ -1,8 +1,10 @@
 <template>
-    <!-- 1. 必须给一个有宽高的容器 -->
-     <div class="box">
-        <div ref="barChart" style="width: 80%; height: 300px;"></div>
-     </div>
+    <div class="box">
+      <div ref="barChart" style="width: 80%; height: 300px;"></div>
+      <div class="btn-wrapper">
+        <el-button>按钮</el-button>
+      </div>
+    </div>
   </template>
   
   <script>
@@ -10,55 +12,79 @@
   
   export default {
     mounted() {
-      // 2. 初始化并配置初始图表
       this.barChart = echarts.init(this.$refs.barChart);
       this.barChart.setOption({
+        // 1. 提示框配置（鼠标悬停/点击柱子时显示）
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow' // 鼠标悬停时显示阴影背景
+          }
+        },
+        // 2. X轴配置
         xAxis: { 
           type: 'category', 
           data: ['周一', '周二', '周三'],
-          name: '星期' // X轴说明
+          name: '星期',
+          axisLabel: {
+            color: 'red' // X轴字体变红
+          }
         },
+        // 3. Y轴配置
         yAxis: { 
           type: 'value',
-          name: '销量 (件)' // Y轴说明
+          name: '销量 (件)',
+          axisLabel: {
+            color: 'red' // Y轴字体变红
+          }
         },
+        // 4. 数据系列（已补全 data 数组）
         series: [{ 
           type: 'bar', 
           data: [10, 20, 30] 
         }]
       });
   
-      // 3. 10秒后切换图表数据
+      // 5. 10秒后切换图表数据
       setTimeout(() => {
         this.barChart.setOption({
           xAxis: { 
             type: 'category', 
             data: ['一月', '二月', '三月'],
-            name: '月份' // 切换时更新 X轴说明
+            name: '月份',
+            axisLabel: { color: 'red' }
           },
           yAxis: { 
             type: 'value',
-            name: '销售额 (万元)' // 切换时更新 Y轴说明
+            name: '销售额 (万元)',
+            axisLabel: { color: 'red' }
           },
           series: [{ 
             type: 'bar', 
-            data: [50, 30, 80] 
+            data: [50, 30, 80] // 已补全切换后的数据
           }]
         });
-      }, 10000); // 10000毫秒 = 10秒
+      }, 10000);
     },
     beforeDestroy() {
-      // 4. 组件销毁时清理，防止内存泄漏
       if (this.barChart) {
         this.barChart.dispose();
       }
     }
   };
   </script>
-<style scoped>
-.box {
+  
+  <style scoped>
+  .box {
     background-color: aqua;
     width: 100%;
     height: 100%;
-}
-</style>
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn-wrapper {
+    margin-top: 20px; 
+  }
+  </style>

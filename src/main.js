@@ -5,6 +5,7 @@ import Vue from 'vue'
 // 引入element ui
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './test-global.css'
 Vue.use(ElementUI);
 
 import App from './App.vue'
@@ -29,13 +30,14 @@ import ParentView from './components/elementUi/01/ParentView.vue';
 import BarChart from './components/elementUi/01/BarChart.vue';
 // 两个div，默认显示第一个div，点击按钮后，将第二个div覆盖住第一个div
 import TwoDiv from './components/elementUi/01/TwoDiv.vue';
-
+// 学习element ui的官网
+import OfficalWebSiteLearn from './components/elementUi/00-official-website/OfficalWebSiteLearn.vue';
 Vue.config.productionTip = false
 
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { BarChart },
-  template: '<BarChart/>'
+  components: { OfficalWebSiteLearn },
+  template: '<OfficalWebSiteLearn/>'
 })

@@ -1,0 +1,10 @@
+body { 
+    background-color: var(--app-bg-color);
+    color: var(--app-text-color);
+    transition: background-color 0.3s, color 0.3s; /* 增加过渡动画，切换更丝滑*/
+}
+
+.custom-card {
+    background-color: var(--app-card-bg);
+    border: 1px solid var(--app-primary-color);
+}
