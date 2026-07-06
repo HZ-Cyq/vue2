@@ -8,3 +8,22 @@ body {
     background-color: var(--app-card-bg);
     border: 1px solid var(--app-primary-color);
 }
+
+/* Element UI el-row theme styles */
+.theme-dark .el-row,
+.theme-blue .el-row,
+.theme-default .el-row {
+    transition: background-color 0.3s;
+}
+
+.theme-dark .el-row {
+    background-color: var(--el-row-bg-color, #1f1f1f);
+}
+
+.theme-blue .el-row {
+    background-color: var(--el-row-bg-color, #ecf5ff);
+}
+
+.theme-default .el-row {
+    background-color: var(--el-row-bg-color, #ffffff);
+}

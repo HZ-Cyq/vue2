@@ -1,7 +1,9 @@
 <template>
     <div>
         <ThemeSwitcher></ThemeSwitcher>
-        <AelRowAndElCol></AelRowAndElCol>
+        <div>
+            <AelRowAndElCol></AelRowAndElCol>
+        </div>
     </div>
 </template>
 <script>
